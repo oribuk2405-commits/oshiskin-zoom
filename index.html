@@ -724,10 +724,21 @@ button, [onclick] { -webkit-tap-highlight-color:rgba(255,255,255,0.08); }
 
 /* Extra small phones */
 @media (max-width: 380px) {
-  .ctrl-btn { width:32px !important; height:32px !important; font-size:12px !important; }
-  .ctrl-btn svg { width:12px !important; height:12px !important; }
-  .end-btn { padding:6px 8px !important; font-size:10px !important; }
-  .room-controls { gap:2px; }
+  .ctrl-btn { width:26px !important; height:26px !important; font-size:10px !important; padding:0 !important; }
+  .ctrl-btn svg { width:10px !important; height:10px !important; }
+  .ctrl-label { font-size:5px !important; }
+  .end-btn { padding:5px 6px !important; font-size:9px !important; }
+  .room-controls { gap:2px !important; padding:4px 4px !important; }
+  .ctrl-wrap { gap:1px !important; }
+}
+
+/* All mobile phones */
+@media (max-width: 600px) {
+  .ctrl-btn { width:28px !important; height:28px !important; }
+  .ctrl-btn svg { width:11px !important; height:11px !important; }
+  .ctrl-label { font-size:6px !important; }
+  .ctrl-wrap { gap:2px !important; }
+  .room-controls { gap:3px !important; }
 }
 </style>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
