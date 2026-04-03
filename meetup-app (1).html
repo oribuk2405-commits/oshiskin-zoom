@@ -1,0 +1,3753 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>זום ישראל — שיחות וידאו</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07080f;
+  --s1: #0d1017;
+  --s2: #13181f;
+  --s3: #1a2030;
+  --blue: #4f8aff;
+  --cyan: #00d4ff;
+  --green: #00e5a0;
+  --red: #ff4d6a;
+  --yellow: #ffcc00;
+  --text: #eef2ff;
+  --muted: #4a5568;
+  --border: rgba(255,255,255,0.06);
+  --glow-blue: rgba(79,138,255,0.25);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; min-height:100dvh; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; }
+html { touch-action:manipulation; }
+@keyframes floatEmoji {
+  0% { opacity:1; transform:translateY(0) scale(1); }
+  100% { opacity:0; transform:translateY(-200px) scale(1.5); }
+}
+
+/* Prevent iOS zoom on input focus - must be 16px minimum */
+input, select, textarea { font-size: 16px !important; }
+
+/* iOS Safari button reset - critical */
+
+
+/* Ensure all buttons respond immediately to touch */
+button:active, .qa-card:active, .ctrl-btn:active {
+  opacity: 0.7;
+  transform: scale(0.97);
+}
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none !important; }
+.page { position:fixed; inset:0; z-index:1; display:none; align-items:center; justify-content:center; pointer-events:none; }
+.page.active { pointer-events:auto; }
+#login-page { overflow-y:auto; -webkit-overflow-scrolling:touch; align-items:flex-start; padding:20px 0; }
+.page.active { display:flex; }
+/* Prevent iOS bounce */
+#room-page { overscroll-behavior:none; }
+/* iOS: all clickable elements must have cursor:pointer */
+[onclick], .action-card, .qa-card, .gp-account, .topbar-user,
+.ctrl-wrap, button, label { cursor:pointer; touch-action:manipulation; }
+/* iOS tap highlight */
+button, [onclick] { -webkit-tap-highlight-color:rgba(255,255,255,0.08); }
+.page.active { display:flex; }
+
+/* LOGIN */
+.login-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:24px;
+  width:100%; max-width:420px; padding:24px;
+  animation: fadeUp 0.7s cubic-bezier(.16,1,.3,1) both;
+  min-height:min-content;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+.brand-logo {
+  font-family:'JetBrains Mono',monospace; font-size:44px; font-weight:700;
+  background:linear-gradient(135deg,var(--cyan) 0%,var(--blue) 60%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  position:relative; display:inline-block;
+}
+.brand-logo::after {
+  content:'●'; font-size:10px; position:absolute; top:8px; right:-16px;
+  -webkit-text-fill-color:var(--green); animation:blink 2s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.brand-tagline { color:var(--muted); font-size:13px; margin-top:6px; letter-spacing:.5px; }
+.login-card {
+  width:100%; background:var(--s1); border:1px solid var(--border);
+  border-radius:24px; padding:32px 28px;
+  box-shadow:0 0 0 1px var(--border),0 40px 80px rgba(0,0,0,.6),0 0 60px var(--glow-blue);
+  position:relative;
+}
+.login-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent);
+}
+.card-title { font-size:22px; font-weight:800; margin-bottom:6px; }
+.card-sub { font-size:13px; color:var(--muted); margin-bottom:28px; line-height:1.6; }
+.google-btn {
+  width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:14px; background:#fff; color:#1a202c;
+  border:none; border-radius:12px;
+  font-size:15px; font-weight:700; font-family:'Heebo',sans-serif;
+  cursor:pointer; transition:all .2s;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:rgba(0,0,0,0.1);
+  position:relative; z-index:1;
+}
+.google-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,.5); }
+.sep { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12px; margin:20px 0; }
+.sep::before,.sep::after { content:''; flex:1; height:1px; background:var(--border); }
+.field {
+  width:100%; background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 16px;
+  color:var(--text); font-size:14px; font-family:'Heebo',sans-serif;
+  outline:none; text-align:right; direction:rtl;
+  transition:border-color .2s,box-shadow .2s; margin-bottom:10px;
+}
+.field:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--glow-blue); }
+.field::placeholder { color:var(--muted); }
+.field.error { border-color:var(--red); box-shadow:0 0 0 3px rgba(255,77,106,.2); }
+.cta-btn {
+  width:100%; padding:13px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border:none; border-radius:10px; color:var(--bg);
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  position:relative; z-index:1;
+  font-size:15px; font-weight:800; font-family:'Heebo',sans-serif;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 20px var(--glow-blue); margin-top:6px;
+}
+.cta-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px var(--glow-blue); }
+.terms { font-size:11px; color:var(--muted); text-align:center; margin-top:18px; line-height:1.7; }
+.terms a { color:var(--blue); text-decoration:none; }
+
+/* LOBBY */
+#lobby-page { flex-direction:column; align-items:stretch; overflow-y:auto; }
+.topbar {
+  display:flex; align-items:center; justify-content:space-between; padding:16px 32px;
+  background:rgba(13,16,23,.85); backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10;
+}
+.topbar-logo {
+  font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.topbar-user { display:flex; align-items:center; gap:10px; cursor:pointer; background:none; border:none; color:var(--text); font-family:'Heebo',sans-serif; padding:0; -webkit-appearance:none; }
+.topbar-avatar {
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:15px; color:var(--bg);
+  border:2px solid rgba(79,138,255,.4);
+}
+.topbar-name { font-size:14px; font-weight:600; }
+.lobby-inner { max-width:960px; margin:0 auto; width:100%; padding:52px 32px; }
+.hero-text { font-size:36px; font-weight:900; line-height:1.2; margin-bottom:10px; }
+.hero-text .hi { color:var(--cyan); }
+.hero-sub { color:var(--muted); font-size:15px; margin-bottom:44px; }
+.quick-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:48px; }
+.qa-card {
+  background:var(--s1); border:1px solid var(--border); border-radius:20px;
+  padding:28px 22px; cursor:pointer;
+  transition:all .25s cubic-bezier(.16,1,.3,1); position:relative; overflow:hidden;
+}
+.qa-card:hover {
+  transform:translateY(-5px); border-color:var(--qa-color,var(--blue));
+  box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 30px var(--qa-glow,var(--glow-blue));
+}
+.qa-icon {
+  width:50px; height:50px; border-radius:14px;
+  background:var(--qa-color,var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; margin-bottom:16px;
+}
+.qa-title { font-size:16px; font-weight:800; margin-bottom:6px; }
+.qa-desc { font-size:12px; color:var(--muted); line-height:1.6; }
+.section-head {
+  font-size:18px; font-weight:800; margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-head::after { content:''; flex:1; height:1px; background:var(--border); }
+.meetings-list { display:flex; flex-direction:column; gap:10px; margin-bottom:48px; }
+.meeting-row {
+  background:var(--s1); border:1px solid var(--border); border-radius:14px;
+  padding:18px 22px; display:flex; align-items:center; justify-content:space-between; transition:all .2s;
+}
+.meeting-row:hover { border-color:var(--blue); transform:translateX(-3px); }
+.meeting-left { display:flex; align-items:center; gap:14px; }
+.meeting-dot {
+  width:10px; height:10px; border-radius:50%; background:var(--green);
+  box-shadow:0 0 8px var(--green); flex-shrink:0; animation:pulse-dot 2s ease infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.5} }
+.meeting-dot.soon { background:var(--yellow); box-shadow:0 0 8px var(--yellow); }
+.meeting-dot.future { background:var(--muted); box-shadow:none; animation:none; }
+.meeting-name { font-size:15px; font-weight:700; margin-bottom:3px; }
+.meeting-time { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+.join-btn {
+  padding:8px 20px; border-radius:8px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border:none; color:var(--bg); font-size:13px; font-weight:800; font-family:'Heebo',sans-serif;
+  cursor:pointer; transition:all .2s;
+}
+.join-btn:hover { transform:scale(1.05); box-shadow:0 4px 15px var(--glow-blue); }
+
+/* MODAL */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(8px);
+  z-index:500; display:none; align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal-box {
+  background:var(--s1); border:1px solid var(--border); border-radius:24px;
+  padding:36px; width:440px;
+  box-shadow:0 0 80px rgba(0,0,0,.8),0 0 40px var(--glow-blue);
+  animation:modalIn .3s cubic-bezier(.16,1,.3,1); position:relative;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(.92) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal-box::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent);
+}
+.modal-title { font-size:20px; font-weight:900; margin-bottom:6px; }
+.modal-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
+.modal-label { font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:600; text-align:right; }
+.modal-close {
+  position:absolute; top:16px; left:16px;
+  background:var(--s2); border:1px solid var(--border); border-radius:8px;
+  width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--muted); font-size:16px; transition:all .2s;
+}
+.modal-close:hover { color:var(--text); border-color:var(--muted); }
+
+/* ROOM */
+#room-page { flex-direction:column; background:#0a0b10; }
+
+.room-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px;
+  background:rgba(10,11,16,0.95); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border); flex-shrink:0; gap:12px;
+}
+.room-title { font-size:14px; font-weight:800; }
+.room-id {
+  font-size:12px; background:var(--s2); border:1px solid var(--border);
+  border-radius:8px; padding:5px 12px; color:var(--muted); cursor:pointer; transition:all .2s;
+}
+.room-id:hover { border-color:var(--blue); color:var(--text); }
+.room-timer { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--green); }
+
+/* Room body — main layout */
+.room-body {
+  flex:1; display:flex; overflow:hidden; min-height:0;
+  position:relative;
+}
+
+/* Video area fills all space */
+.video-grid-wrap {
+  flex:1; display:flex; flex-direction:column;
+  overflow-y:auto; padding:12px; gap:10px;
+  position:relative;
+}
+.video-grid-wrap::-webkit-scrollbar { width:4px; }
+.video-grid-wrap::-webkit-scrollbar-thumb { background:var(--s3); border-radius:4px; }
+
+/* Grid of participant tiles */
+.video-area {
+  display:grid; gap:10px;
+  grid-template-columns:repeat(2,1fr);
+  align-content:start;
+  width:100%;
+}
+
+/* Each participant tile */
+.vtile {
+  background:var(--s2);
+  border-radius:14px;
+  border:2px solid transparent;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  transition:border-color .25s, box-shadow .25s;
+  width:100%;
+  min-height:150px;
+  aspect-ratio:4/3;
+}
+
+/* Overflow tile — shows all avatars in one combined tile */
+.vtile-overflow {
+  background:var(--s2);
+  border-radius:12px;
+  border:2px solid var(--border);
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  aspect-ratio:1/1;
+  gap:6px;
+  cursor:default;
+}
+.overflow-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:10px;
+  width:100%; height:100%;
+}
+.overflow-av {
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:900; color:#fff;
+  overflow:hidden;
+}
+.overflow-av img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
+.overflow-count {
+  position:absolute; bottom:8px; left:0; right:0;
+  text-align:center; font-size:11px; color:var(--muted); font-weight:700;
+}
+.vtile video {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  border-radius:8px; display:none;
+}
+.vtile video.active { display:block; }
+
+/* Speaking ring */
+.vtile.speaking {
+  border-color:var(--green) !important;
+  box-shadow: 0 0 0 3px rgba(0,229,160,.35), 0 0 20px rgba(0,229,160,.2);
+  animation: speak-pulse 1.5s ease infinite;
+}
+@keyframes speak-pulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(0,229,160,.35), 0 0 20px rgba(0,229,160,.2); }
+  50%      { box-shadow: 0 0 0 5px rgba(0,229,160,.5), 0 0 30px rgba(0,229,160,.35); }
+}
+.vtile.self { border-color:rgba(79,138,255,.4); }
+.vtile.muted-tile { opacity:.9; }
+
+/* Avatar inside tile (camera off) */
+.tile-cam-off {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  background:var(--s2);
+  overflow:hidden;
+}
+/* If user has a profile photo — fill entire tile */
+.tile-cam-off.has-photo {
+  padding:0; gap:0;
+}
+.tile-cam-off.has-photo img.tile-profile-img {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  display:block;
+}
+.tile-avatar {
+  width:72px; height:72px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:900; color:#fff;
+  flex-shrink:0;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+  overflow:hidden;
+}
+.tile-avatar img {
+  width:100%; height:100%; object-fit:cover; border-radius:50%;
+}
+
+/* Name bar at bottom */
+.tile-namebar {
+  position:absolute; bottom:0; left:0; right:0;
+  background:linear-gradient(transparent, rgba(0,0,0,.8));
+  padding:20px 8px 6px;
+  display:flex; align-items:center; justify-content:space-between;
+  z-index:2;
+}
+.tile-name { font-size:11px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tile-badges { display:flex; gap:3px; align-items:center; flex-shrink:0; }
+.badge {
+  font-size:9px; font-weight:700; border-radius:4px;
+  padding:2px 5px; line-height:1.4;
+}
+.badge-admin { background:#f59e0b; color:#000; }
+.badge-muted { background:var(--red); color:#fff; }
+.badge-you   { background:var(--blue); color:#fff; }
+
+/* CHAT — fixed to bottom-right */
+.chat-panel {
+  position:fixed; bottom:80px; left:16px;
+  width:280px; height:340px;
+  background:rgba(13,16,23,.95); border:1px solid var(--border);
+  border-radius:16px; display:flex; flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+  z-index:20; transition:all .3s;
+  backdrop-filter:blur(20px);
+}
+.chat-panel.hidden { display:none; }
+.chat-head {
+  padding:12px 14px; border-bottom:1px solid var(--border);
+  font-size:13px; font-weight:800; flex-shrink:0;
+  display:flex; align-items:center; justify-content:space-between;
+  border-radius:16px 16px 0 0;
+}
+.chat-messages {
+  flex:1; overflow-y:auto; padding:10px;
+  display:flex; flex-direction:column; gap:8px; direction:rtl;
+}
+.chat-messages::-webkit-scrollbar { width:3px; }
+.chat-messages::-webkit-scrollbar-thumb { background:var(--s3); border-radius:3px; }
+.msg { font-size:12px; line-height:1.5; }
+.msg-who { font-weight:800; color:var(--cyan); margin-bottom:2px; font-size:10px; }
+.msg-bubble {
+  background:var(--s2); border-radius:8px 0 8px 8px;
+  padding:6px 10px; display:inline-block; max-width:100%; border:1px solid var(--border);
+}
+.msg.self .msg-bubble { background:rgba(79,138,255,.15); border-color:rgba(79,138,255,.3); border-radius:8px 8px 0 8px; }
+.chat-input-area {
+  padding:8px 10px; border-top:1px solid var(--border);
+  flex-shrink:0; display:flex; gap:6px;
+  border-radius:0 0 16px 16px;
+}
+.chat-field {
+  flex:1; background:var(--s2); border:1px solid var(--border); border-radius:8px;
+  color:var(--text); padding:7px 10px; font-size:12px; font-family:'Heebo',sans-serif;
+  outline:none; direction:rtl; transition:border-color .2s;
+}
+.chat-field:focus { border-color:var(--blue); }
+.send-btn {
+  width:30px; height:30px; border-radius:7px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border:none; color:var(--bg); font-size:13px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all .2s; flex-shrink:0;
+}
+.send-btn:hover { transform:scale(1.08); }
+
+/* Controls — bottom center */
+.room-controls {
+  padding:10px 20px;
+  padding-bottom:max(10px, env(safe-area-inset-bottom));
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  background:rgba(6,7,9,.98); border-top:1px solid var(--border);
+  flex-shrink:0; position:relative; z-index:10;
+}
+/* Mic fixed bottom-left */
+#mic-btn-fixed {
+  position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
+  left:16px; z-index:100;
+  width:56px; height:56px; border-radius:50%;
+  background:var(--s2); border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; touch-action:manipulation;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+/* Cam fixed bottom-right */
+#cam-btn-fixed {
+  position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
+  right:16px; z-index:100;
+  width:56px; height:56px; border-radius:50%;
+  background:var(--s2); border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; touch-action:manipulation;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+#mic-btn-fixed.muted { background:rgba(255,77,106,.2); border-color:var(--red); }
+#cam-btn-fixed.active { background:rgba(79,138,255,.2); border-color:var(--blue); }
+.ctrl-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; touch-action:manipulation; }
+.ctrl-label { pointer-events:none; }
+.ctrl-btn {
+  width:50px; height:50px; border-radius:14px; border:1px solid var(--border);
+  background:var(--s2); color:var(--text); font-size:18px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+  -webkit-appearance:none; appearance:none;
+  position:relative;
+  /* iOS tap fix */
+  -webkit-tap-highlight-color:rgba(255,255,255,0.1);
+}
+.ctrl-btn:hover { background:var(--s3); border-color:var(--blue); transform:translateY(-2px); }
+.ctrl-btn.active { background:rgba(79,138,255,.15); border-color:var(--blue); }
+.ctrl-btn.muted { background:rgba(255,77,106,.15); border-color:var(--red); }
+.ctrl-label { font-size:9px; color:var(--muted); font-weight:600; }
+.end-btn {
+  padding:11px 22px; border-radius:12px; background:var(--red);
+  border:none; color:white; font-size:14px; font-weight:800; font-family:'Heebo',sans-serif;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 20px rgba(255,77,106,.4);
+  display:flex; align-items:center; gap:6px;
+}
+.end-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(255,77,106,.5); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--s2); border:1px solid var(--border); border-radius:10px;
+  padding:10px 18px; font-size:13px; font-weight:600;
+  box-shadow:0 8px 30px rgba(0,0,0,.5); z-index:9999;
+  transition:opacity .3s ease, transform .3s ease;
+  white-space:nowrap; opacity:0; pointer-events:none;
+}
+.toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-thumb { background:var(--s3); border-radius:4px; }
+
+/* ADMIN PANEL — floating */
+#admin-panel {
+  display:none; position:fixed; top:60px; right:12px;
+  z-index:150; background:var(--s1); border:1px solid rgba(245,158,11,.35);
+  border-radius:16px; padding:16px 18px; min-width:240px; max-width:260px;
+  box-shadow:0 8px 40px rgba(0,0,0,.8);
+  max-height:80vh; overflow-y:auto;
+}
+.admin-btn {
+  width:100%; padding:10px 14px; border-radius:10px;
+  font-size:13px; font-weight:700; font-family:'Heebo',sans-serif;
+  cursor:pointer; text-align:right; transition:all .2s;
+}
+
+/* KICK USER MODAL */
+#kick-modal .modal-box { max-height:80vh; overflow-y:auto; }
+.kick-user-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; margin-bottom:8px; gap:10px;
+}
+.kick-user-info { display:flex; align-items:center; gap:10px; flex:1; }
+.kick-avatar {
+  width:36px; height:36px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:900; color:#fff;
+}
+.kick-btn {
+  padding:6px 12px; border-radius:8px; background:rgba(255,77,106,.15);
+  border:1px solid var(--red); color:var(--red);
+  font-size:12px; font-weight:700; font-family:'Heebo',sans-serif;
+  cursor:pointer; transition:all .2s; flex-shrink:0;
+}
+.kick-btn:hover { background:rgba(255,77,106,.3); }
+
+/* SPEAK ALLOW MODAL */
+.speak-user-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; margin-bottom:8px; gap:10px;
+}
+.speak-toggle {
+  padding:6px 12px; border-radius:8px;
+  font-size:12px; font-weight:700; font-family:'Heebo',sans-serif;
+  cursor:pointer; transition:all .2s; flex-shrink:0;
+}
+.speak-toggle.allowed {
+  background:rgba(0,229,160,.15); border:1px solid var(--green); color:var(--green);
+}
+.speak-toggle.blocked {
+  background:rgba(255,77,106,.1); border:1px solid rgba(255,77,106,.4); color:var(--muted);
+}
+
+/* Participants sidebar - top right */
+.participants-sidebar {
+  position:fixed; top:52px; right:0;
+  width:170px; background:rgba(13,16,23,.9); border-left:1px solid var(--border);
+  padding:8px; overflow-y:auto; max-height:calc(100vh - 130px);
+  z-index:15; display:none; backdrop-filter:blur(16px);
+}
+.participants-sidebar.show { display:block; }
+.psb-title { font-size:11px; font-weight:800; color:var(--muted); padding:4px 6px 8px; }
+.psb-item {
+  display:flex; align-items:center; gap:8px; padding:6px 8px;
+  border-radius:8px; transition:background .2s; cursor:default;
+}
+.psb-item:hover { background:var(--s2); }
+.psb-item.psb-self {
+  padding:4px 8px;
+}
+.psb-av {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:900; color:#fff;
+  overflow:hidden;
+}
+.psb-item.psb-self .psb-av { width:20px; height:20px; font-size:9px; }
+.psb-item.psb-self .psb-name { font-size:10px; color:var(--muted); font-weight:500; }
+.psb-item.psb-self .psb-icons { font-size:9px; }
+.psb-av img { width:100%; height:100%; object-fit:cover; }
+.psb-name { font-size:11px; font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.psb-icons { display:flex; gap:3px; }
+.psb-icons span { font-size:10px; }
+
+/* Google popup */
+.google-popup {
+  position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(10px);
+  z-index:1000; display:none; align-items:center; justify-content:center;
+  -webkit-overflow-scrolling:touch;
+}
+.google-popup.open { display:flex; }
+.gp-box {
+  background:#fff; border-radius:24px; padding:28px 22px; width:380px;
+  max-height:92vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  box-shadow:0 20px 80px rgba(0,0,0,.8); color:#1a202c; text-align:center;
+  animation:modalIn .3s cubic-bezier(.16,1,.3,1);
+  position:relative; z-index:101;
+}
+.gp-box::-webkit-scrollbar { width:4px; }
+.gp-box input, .gp-box select { font-size:16px !important; }
+.login-card input { font-size:16px !important; }
+.gp-box::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
+.gp-logo { font-size:28px; margin-bottom:10px; }
+.gp-title { font-size:18px; font-weight:700; margin-bottom:4px; }
+.gp-sub { font-size:13px; color:#6b7280; margin-bottom:24px; }
+.gp-account {
+  display:flex; align-items:center; gap:12px; padding:12px 16px;
+  border:1px solid #e5e7eb; border-radius:12px; cursor:pointer;
+  touch-action:manipulation; -webkit-tap-highlight-color:rgba(0,0,0,0.05);
+  -webkit-appearance:none; appearance:none; background:#fff;
+  font-family:'Heebo',sans-serif; font-size:inherit; color:#1a202c;
+  text-align:right; width:100%;
+  transition:all .2s; margin-bottom:10px; text-align:right;
+}
+.gp-account:hover { border-color:#4285F4; background:#f0f4ff; }
+.gp-acc-av {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,#4285F4,#34A853);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:800; color:#fff; flex-shrink:0;
+}
+.gp-acc-name { font-size:14px; font-weight:700; }
+.gp-acc-email { font-size:12px; color:#6b7280; }
+.gp-cancel { margin-top:16px; font-size:13px; color:#6b7280; cursor:pointer; }
+.gp-cancel:hover { color:#1a202c; }
+
+/* ══════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ══════════════════════════════════════════ */
+@media (max-width: 600px) {
+  /* Login page */
+  .login-wrap { padding:16px; width:100%; }
+  .login-card { padding:20px 16px; border-radius:16px; }
+  .card-title { font-size:18px; }
+  .card-sub { margin-bottom:18px; }
+  .brand-logo { font-size:26px; }
+  .google-btn { font-size:14px; padding:13px; }
+
+  /* Lobby page */
+  #lobby-page { padding:0; }
+  .lobby-inner { padding:12px; gap:12px; }
+  .lobby-header { padding:12px 14px; border-radius:12px; }
+  .action-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .action-card { padding:16px 10px; }
+  .action-icon { font-size:22px; }
+  .action-title { font-size:13px; }
+
+  /* Room header — compact */
+  .room-header { padding:8px 10px; gap:6px; }
+  .room-title { font-size:13px; }
+  .hdr-right { gap:6px; }
+  .hdr-btn { padding:6px 10px; font-size:11px; }
+
+  /* Video grid — 2 columns small on mobile */
+  .video-area { grid-template-columns:1fr 1fr !important; }
+  .vtile { min-height:85px !important; aspect-ratio:4/3; }
+  .video-grid-wrap { padding:5px; gap:5px; }
+
+  /* Controls bar — compact */
+  .room-controls {
+    padding:5px 6px !important;
+    padding-bottom:max(5px, env(safe-area-inset-bottom)) !important;
+    gap:3px; flex-wrap:nowrap; overflow-x:auto;
+    justify-content:flex-start;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .room-controls::-webkit-scrollbar { display:none; }
+  .ctrl-wrap { flex-shrink:0; }
+  .ctrl-btn {
+    width:36px !important; height:36px !important;
+    font-size:13px !important; border-radius:9px !important;
+    -webkit-appearance:none !important;
+    cursor:pointer !important;
+  }
+  .ctrl-btn svg { width:14px !important; height:14px !important; }
+  .ctrl-label { font-size:7px !important; }
+  .end-btn { padding:7px 10px !important; font-size:11px !important; flex-shrink:0; gap:4px !important; }
+  .end-btn svg { width:12px !important; height:12px !important; }
+
+  /* Chat panel — full width bottom sheet */
+  #chat-panel {
+    left:0 !important; right:0 !important; bottom:80px !important;
+    width:100% !important; border-radius:16px 16px 0 0 !important;
+    max-height:55vh;
+  }
+
+  /* Participants sidebar — full width */
+  #participants-sidebar {
+      top:60px;left:0;
+    bottom:80px; width:100% !important; border-radius:16px 16px 0 0;
+    max-height:60vh;
+  }
+
+  /* Admin panel */
+  #admin-panel { right:8px; left:8px; transform:none; min-width:unset; }
+
+  /* Google popup */
+  .gp-box { width:95vw; padding:18px 14px; border-radius:16px; max-height:90vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .gp-title { font-size:16px !important; margin-bottom:3px !important; }
+  .gp-sub { font-size:12px !important; margin-bottom:16px !important; }
+
+  /* Modals */
+  .modal-box { width:95vw !important; max-width:unset !important; padding:20px 16px !important; }
+
+  /* Settings modal — bottom sheet on mobile */
+  #settings-modal {
+    align-items:flex-end !important;
+  }
+  #settings-modal .modal-box {
+    width:100% !important;
+    max-width:100% !important;
+    border-radius:20px 20px 0 0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    max-height:85vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* Toast */
+  .toast { font-size:12px; max-width:90vw; white-space:normal; text-align:center; }
+
+  /* Screen share button — hide on mobile */
+  /* screen-btn-wrap shown on all */
+
+  /* Show flip camera button on mobile */
+  #flip-cam-wrap { display:flex !important; }
+
+  /* Tile name bar */
+  .tile-name { font-size:9px; padding:3px 6px !important; }
+  .tile-avatar { width:40px !important; height:40px !important; font-size:16px !important; }
+}
+
+/* Extra small phones */
+@media (max-width: 380px) {
+  .ctrl-btn { width:32px !important; height:32px !important; font-size:12px !important; }
+  .ctrl-btn svg { width:12px !important; height:12px !important; }
+  .end-btn { padding:6px 8px !important; font-size:10px !important; }
+  .room-controls { gap:2px; }
+}
+</style>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════════════════════════════════
+// WEBRTC CLIENT - INTEGRATED WITH EXISTING APP
+// ════════════════════════════════════════════════════════════════════════════════════════
+
+let webrtcClient = null;
+
+class WebRTCClient {
+  constructor(signalingServerUrl) {
+    this.signalingServerUrl = signalingServerUrl;
+    this.socket = null;
+    this.peerConnections = new Map();
+    this.dataChannels = new Map();
+    this.localStream = null;
+    this.remoteStreams = new Map();
+    this.currentRoomCode = null;
+    this.currentParticipantId = null;
+    this.currentParticipantName = null;
+    this.iceServers = [
+      { urls: ['stun:stun.l.google.com:19302'] },
+      { urls: ['stun:stun1.l.google.com:19302'] },
+      { urls: ['stun:stun2.l.google.com:19302'] },
+      { urls: ['stun:stun3.l.google.com:19302'] },
+      { urls: ['stun:stun4.l.google.com:19302'] },
+    ];
+    this.callbacks = {
+      onRemoteStream: null,
+      onRemoteStreamRemoved: null,
+      onParticipantJoined: null,
+      onParticipantLeft: null,
+      onParticipantStatusUpdated: null,
+      onChatMessage: null,
+      onEmoji: null,
+      onConnectionStateChange: null,
+      onError: null,
+    };
+  }
+
+  async initialize() {
+    return new Promise((resolve, reject) => {
+      try {
+        this.socket = io(this.signalingServerUrl, {
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          reconnectionAttempts: 5,
+          transports: ['websocket', 'polling'],
+        });
+
+        this.socket.on('connect', () => {
+          console.log('[WebRTC] Connected to signaling server');
+          this.triggerCallback('onConnectionStateChange', { state: 'connected' });
+          resolve();
+        });
+
+        this.socket.on('disconnect', () => {
+          console.log('[WebRTC] Disconnected from signaling server');
+          this.triggerCallback('onConnectionStateChange', { state: 'disconnected' });
+        });
+
+        this.socket.on('connect_error', (error) => {
+          console.error('[WebRTC] Connection error:', error);
+          this.triggerCallback('onError', { error: 'Connection error' });
+          reject(error);
+        });
+
+        this.setupSocketListeners();
+      } catch (error) {
+        console.error('[WebRTC] Failed to initialize:', error);
+        reject(error);
+      }
+    });
+  }
+
+  setupSocketListeners() {
+    this.socket.on('offer', (data) => this.handleOffer(data));
+    this.socket.on('answer', (data) => this.handleAnswer(data));
+    this.socket.on('ice-candidate', (data) => this.handleIceCandidate(data));
+    this.socket.on('participant-joined', (data) => {
+      console.log('[WebRTC] Participant joined:', data.participant.name);
+      this.triggerCallback('onParticipantJoined', data);
+      this.createOfferForParticipant(data.participant.id);
+    });
+    this.socket.on('participant-left', (data) => {
+      console.log('[WebRTC] Participant left:', data.name);
+      this.closeConnection(data.participantId);
+      this.triggerCallback('onParticipantLeft', data);
+    });
+    this.socket.on('participant-status-updated', (data) => {
+      this.triggerCallback('onParticipantStatusUpdated', data);
+    });
+    this.socket.on('participant-list', (data) => {
+      console.log('[WebRTC] Participant list:', data.participants.length);
+    });
+    this.socket.on('chat-message', (data) => {
+      this.triggerCallback('onChatMessage', data);
+    });
+    this.socket.on('emoji', (data) => {
+      this.triggerCallback('onEmoji', data);
+    });
+  }
+
+  async joinRoom(roomCode, participantId, name, email) {
+    return new Promise((resolve, reject) => {
+      if (!this.socket || !this.socket.connected) {
+        reject(new Error('Socket not connected'));
+        return;
+      }
+
+      this.currentRoomCode = roomCode;
+      this.currentParticipantId = participantId;
+      this.currentParticipantName = name;
+
+      this.socket.emit('join-room', {
+        roomCode,
+        participantId,
+        name,
+        email,
+      }, (response) => {
+        if (response.success) {
+          console.log('[WebRTC] Joined room:', roomCode);
+          response.participants.forEach((participant) => {
+            this.createOfferForParticipant(participant.id);
+          });
+          resolve(response);
+        } else {
+          console.error('[WebRTC] Failed to join room:', response.error);
+          reject(new Error(response.error));
+        }
+      });
+    });
+  }
+
+  leaveRoom() {
+    if (this.currentRoomCode) {
+      this.socket.emit('leave-room', { roomCode: this.currentRoomCode });
+      this.peerConnections.forEach((pc) => pc.close());
+      this.peerConnections.clear();
+      this.dataChannels.clear();
+      this.remoteStreams.clear();
+      this.currentRoomCode = null;
+      this.currentParticipantId = null;
+      console.log('[WebRTC] Left room');
+    }
+  }
+
+  async setLocalStream(stream) {
+    this.localStream = stream;
+    console.log('[WebRTC] Local stream set');
+    this.peerConnections.forEach((pc, participantId) => {
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream);
+      });
+    });
+  }
+
+  createPeerConnection(participantId) {
+    if (this.peerConnections.has(participantId)) {
+      return this.peerConnections.get(participantId);
+    }
+
+    const peerConnection = new RTCPeerConnection({
+      iceServers: this.iceServers,
+    });
+
+    if (this.localStream) {
+      this.localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, this.localStream);
+      });
+    }
+
+    peerConnection.ontrack = (event) => {
+      console.log('[WebRTC] Remote track received from:', participantId);
+      const remoteStream = event.streams[0];
+      if (!this.remoteStreams.has(participantId)) {
+        this.remoteStreams.set(participantId, remoteStream);
+        this.triggerCallback('onRemoteStream', {
+          participantId,
+          stream: remoteStream,
+        });
+      }
+    };
+
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        this.socket.emit('ice-candidate', {
+          roomCode: this.currentRoomCode,
+          targetParticipantId: participantId,
+          candidate: event.candidate,
+        });
+      }
+    };
+
+    peerConnection.onconnectionstatechange = () => {
+      console.log('[WebRTC] Connection state:', peerConnection.connectionState);
+      if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'disconnected') {
+        this.closeConnection(participantId);
+      }
+    };
+
+    const dataChannel = peerConnection.createDataChannel('signaling', { ordered: true });
+    this.setupDataChannel(participantId, dataChannel);
+
+    peerConnection.ondatachannel = (event) => {
+      this.setupDataChannel(participantId, event.channel);
+    };
+
+    this.peerConnections.set(participantId, peerConnection);
+    return peerConnection;
+  }
+
+  setupDataChannel(participantId, dataChannel) {
+    dataChannel.onopen = () => {
+      console.log('[WebRTC] Data channel opened with:', participantId);
+    };
+    dataChannel.onmessage = (event) => {
+      console.log('[WebRTC] Data channel message:', event.data);
+    };
+    dataChannel.onerror = (error) => {
+      console.error('[WebRTC] Data channel error:', error);
+    };
+    dataChannel.onclose = () => {
+      console.log('[WebRTC] Data channel closed with:', participantId);
+    };
+    this.dataChannels.set(participantId, dataChannel);
+  }
+
+  async createOfferForParticipant(participantId) {
+    try {
+      const peerConnection = this.createPeerConnection(participantId);
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      this.socket.emit('offer', {
+        roomCode: this.currentRoomCode,
+        targetParticipantId: participantId,
+        offer: offer,
+      });
+
+      console.log('[WebRTC] Offer sent to:', participantId);
+    } catch (error) {
+      console.error('[WebRTC] Failed to create offer:', error);
+      this.triggerCallback('onError', { error: 'Failed to create offer' });
+    }
+  }
+
+  async handleOffer(data) {
+    try {
+      const { fromParticipantId, offer } = data;
+      const peerConnection = this.createPeerConnection(fromParticipantId);
+
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+
+      this.socket.emit('answer', {
+        roomCode: this.currentRoomCode,
+        targetParticipantId: fromParticipantId,
+        answer: answer,
+      });
+
+      console.log('[WebRTC] Answer sent to:', fromParticipantId);
+    } catch (error) {
+      console.error('[WebRTC] Failed to handle offer:', error);
+      this.triggerCallback('onError', { error: 'Failed to handle offer' });
+    }
+  }
+
+  async handleAnswer(data) {
+    try {
+      const { fromParticipantId, answer } = data;
+      const peerConnection = this.peerConnections.get(fromParticipantId);
+
+      if (peerConnection) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        console.log('[WebRTC] Answer received from:', fromParticipantId);
+      }
+    } catch (error) {
+      console.error('[WebRTC] Failed to handle answer:', error);
+      this.triggerCallback('onError', { error: 'Failed to handle answer' });
+    }
+  }
+
+  async handleIceCandidate(data) {
+    try {
+      const { fromParticipantId, candidate } = data;
+      const peerConnection = this.peerConnections.get(fromParticipantId);
+
+      if (peerConnection && candidate) {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    } catch (error) {
+      console.error('[WebRTC] Failed to add ICE candidate:', error);
+    }
+  }
+
+  closeConnection(participantId) {
+    const peerConnection = this.peerConnections.get(participantId);
+    if (peerConnection) {
+      peerConnection.close();
+      this.peerConnections.delete(participantId);
+    }
+
+    const dataChannel = this.dataChannels.get(participantId);
+    if (dataChannel) {
+      dataChannel.close();
+      this.dataChannels.delete(participantId);
+    }
+
+    const remoteStream = this.remoteStreams.get(participantId);
+    if (remoteStream) {
+      remoteStream.getTracks().forEach((track) => track.stop());
+      this.remoteStreams.delete(participantId);
+      this.triggerCallback('onRemoteStreamRemoved', { participantId });
+    }
+  }
+
+  sendChatMessage(message) {
+    if (this.socket && this.currentRoomCode) {
+      this.socket.emit('chat-message', {
+        roomCode: this.currentRoomCode,
+        message,
+      });
+    }
+  }
+
+  sendEmoji(emoji) {
+    if (this.socket && this.currentRoomCode) {
+      this.socket.emit('emoji', {
+        roomCode: this.currentRoomCode,
+        emoji,
+      });
+    }
+  }
+
+  updateParticipantStatus(status) {
+    if (this.socket && this.currentRoomCode) {
+      this.socket.emit('participant-status', {
+        roomCode: this.currentRoomCode,
+        ...status,
+      });
+    }
+  }
+
+  on(eventName, callback) {
+    const callbackName = `on${eventName.charAt(0).toUpperCase()}${eventName.slice(1)}`;
+    if (this.callbacks.hasOwnProperty(callbackName)) {
+      this.callbacks[callbackName] = callback;
+    }
+  }
+
+  triggerCallback(callbackName, data) {
+    if (this.callbacks[callbackName] && typeof this.callbacks[callbackName] === 'function') {
+      this.callbacks[callbackName](data);
+    }
+  }
+
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+    this.leaveRoom();
+  }
+}
+
+// Initialize WebRTC client - wait for socket.io to load
+function initWebRTC() {
+  if (typeof io === 'undefined') {
+    // socket.io not loaded yet, retry in 200ms
+    setTimeout(initWebRTC, 200);
+    return;
+  }
+  try {
+    webrtcClient = new WebRTCClient('https://oshiskin-zoom-production.up.railway.app');
+    console.log('[WebRTC] Client ready');
+  } catch (error) {
+    console.error('[WebRTC] Failed to create client:', error);
+  }
+}
+window.addEventListener('load', initWebRTC);
+</script>
+
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<!-- GOOGLE POPUP -->
+<div class="google-popup" id="google-popup">
+  <div class="gp-box">
+    <div class="gp-logo">🔐</div>
+    <div class="gp-title" id="gp-main-title">בחר חשבון</div>
+    <div class="gp-sub"></div>
+    <div id="google-accounts-list"><!-- filled by JS --></div>
+
+    <!-- CREATE ACCOUNT FORM -->
+    <div id="add-google-form" style="display:none;margin-top:12px;border-top:1px solid #e5e7eb;padding-top:14px">
+      <div style="font-size:13px;font-weight:800;color:#1a202c;margin-bottom:10px;text-align:right">✨ צור חשבון חדש</div>
+      <input id="new-google-name"  type="text"     placeholder="שם מלא"                style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-family:'Heebo',sans-serif;font-size:13px;margin-bottom:8px;direction:rtl;outline:none;color:#1a202c;display:block">
+      <input id="new-google-email" type="email"    placeholder="כתובת אימייל"           style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-family:'Heebo',sans-serif;font-size:13px;margin-bottom:8px;direction:rtl;outline:none;color:#1a202c;display:block">
+      <input id="new-google-pass"  type="password" placeholder="סיסמה (לפחות 6 תווים)" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-family:'Heebo',sans-serif;font-size:13px;margin-bottom:10px;direction:rtl;outline:none;color:#1a202c;display:block">
+      <!-- Profile photo picker -->
+      <div style="text-align:right;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">תמונת פרופיל</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div id="photo-preview" style="width:56px;height:56px;border-radius:50%;background:#e5e7eb;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid #d1d5db">👤</div>
+        <label style="flex:1;padding:9px 12px;background:#f3f4f6;border:1px dashed #9ca3af;border-radius:8px;font-family:'Heebo',sans-serif;font-size:12px;color:#4285F4;font-weight:700;cursor:pointer;text-align:center;display:block">
+          📁 העלה תמונה מהמחשב
+          <input type="file" id="new-google-photo" accept="image/*" style="display:none" onchange="previewProfilePhoto(this)">
+        </label>
+      </div>
+      <!-- Preset nature/objects images -->
+      <div style="text-align:right;font-size:11px;color:#6b7280;margin-bottom:6px">או בחר תמונה מוכנה:</div>
+      <div id="preset-photos" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px">
+        <!-- filled by JS -->
+      </div>
+      <div id="add-google-error" style="color:#ef4444;font-size:11px;margin-bottom:8px;display:none;text-align:right"></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button type="button" onclick="confirmAddGoogleAccount()" style="flex:1;padding:10px;background:#4285F4;color:#fff;border:none;border-radius:8px;font-family:'Heebo',sans-serif;font-weight:800;font-size:16px;cursor:pointer;touch-action:manipulation;-webkit-appearance:none">צור חשבון</button>
+        <button type="button" onclick="hideAddForm()" style="flex:1;padding:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-family:'Heebo',sans-serif;font-weight:700;font-size:16px;cursor:pointer;touch-action:manipulation;-webkit-appearance:none">ביטול</button>
+      </div>
+    </div>
+
+    <!-- PASSWORD PROMPT FOR EXISTING ACCOUNT -->
+    <div id="google-pass-form" style="display:none;margin-top:12px;border-top:1px solid #e5e7eb;padding-top:14px">
+      <div id="google-pass-label" style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:10px;text-align:right"></div>
+      <input id="google-pass-input" type="password" placeholder="הכנס סיסמה" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-family:'Heebo',sans-serif;font-size:13px;margin-bottom:4px;direction:rtl;outline:none;color:#1a202c;display:block">
+      <div id="google-pass-error" style="color:#ef4444;font-size:11px;margin-bottom:8px;display:none;text-align:right"></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button type="button" onclick="confirmGooglePass()" style="flex:1;padding:10px;background:#4285F4;color:#fff;border:none;border-radius:8px;font-family:'Heebo',sans-serif;font-weight:800;font-size:16px;cursor:pointer;touch-action:manipulation;-webkit-appearance:none">כניסה</button>
+        <button type="button" onclick="hidePassForm()" style="flex:1;padding:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-family:'Heebo',sans-serif;font-weight:700;font-size:16px;cursor:pointer;touch-action:manipulation;-webkit-appearance:none">ביטול</button>
+      </div>
+    </div>
+
+    <button type="button" class="gp-cancel" onclick="closeGooglePopup()" style="-webkit-appearance:none;appearance:none;background:none;border:none;font-family:'Heebo',sans-serif;font-size:13px;color:#6b7280;cursor:pointer;width:100%;touch-action:manipulation">סגור</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="page active" id="login-page">
+  <div class="login-wrap">
+    <div style="text-align:center">
+      <div class="brand-logo">זום ישראל</div>
+      <div class="brand-tagline">שיחות וידאו · קלות · מהירות · חינם</div>
+    </div>
+    <div class="login-card">
+      <div class="card-title">ברוכים הבאים 👋</div>
+      <div class="card-sub">התחברו עם Google או הזינו פרטים ידנית</div>
+      <button type="button" class="google-btn" onclick="loginWithGoogle()" style="touch-action:manipulation;-webkit-appearance:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        המשך עם Google
+      </button>
+      <div class="sep">או</div>
+      <input class="field" type="email" placeholder="כתובת אימייל" id="email-field" />
+      <input class="field" type="password" placeholder="סיסמה (לפחות 6 תווים)" id="pass-field" style="margin-bottom:0" />
+      <div id="login-error" style="color:var(--red);font-size:12px;margin-top:6px;display:none;text-align:right"></div>
+      <button type="button" class="cta-btn" onclick="loginManual()" style="touch-action:manipulation;-webkit-appearance:none">כניסה לחשבון</button>
+      <div class="terms">בכניסה אתם מסכימים ל<a href="#">תנאי השימוש</a> ו<a href="#">מדיניות הפרטיות</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div class="page" id="lobby-page">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:6px">
+      <button type="button" onclick="openAddUserModal()" style="display:flex;align-items:center;gap:4px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 10px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation">
+        ➕ משתמש
+      </button>
+      <button type="button" onclick="switchUser()" style="display:flex;align-items:center;gap:4px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 10px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation">
+        🚪 יציאה
+      </button>
+      <button type="button" onclick="deleteCurrentUser()" style="display:flex;align-items:center;gap:4px;background:rgba(255,77,106,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);padding:6px 10px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation">
+        🗑️ מחק
+      </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button type="button" onclick="openSettings()" style="display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 11px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation">
+        ⚙️
+      </button>
+      <button type="button" onclick="openCredits()" style="display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 10px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation">
+        ℹ️
+      </button>
+      <button type="button" class="topbar-user" onclick="toggleProfilePopup()">
+        <div class="topbar-avatar" id="user-avatar">י</div>
+        <div class="topbar-name" id="user-name">ישראל ישראלי</div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--muted)"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Permission banner - shown until granted -->
+  <div id="perm-banner" style="display:none;margin:40px 16px 0;background:linear-gradient(135deg,rgba(79,138,255,.15),rgba(0,229,160,.1));border:1px solid rgba(79,138,255,.4);border-radius:16px;padding:14px 16px;text-align:center">
+    <div style="font-size:18px;margin-bottom:6px">🎙️ 📹</div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:4px;color:var(--text)">הפעל מצלמה ומיקרופון</div>
+    <div id="perm-banner-text" style="font-size:12px;color:var(--muted);margin-bottom:10px">לחץ כאן — הדפדפן ישאל אם לאפשר</div>
+    <button type="button" id="perm-grant-btn" onclick="grantPermissions()" style="background:linear-gradient(135deg,#4f8aff,#00e5a0);border:none;border-radius:10px;color:#000;font-family:'Heebo',sans-serif;font-size:14px;font-weight:900;padding:10px 24px;cursor:pointer;touch-action:manipulation;width:100%;-webkit-appearance:none">
+      ✅ אפשר גישה
+    </button>
+  </div>
+
+  <div class="lobby-inner">
+    <div class="hero-text">שלום, <span class="hi" id="hero-name">ישראל</span> 👾</div>
+    <div class="hero-sub">מה תרצה לעשות היום?</div>
+    <div class="quick-actions">
+      <button type="button" class="qa-card" style="--qa-color:#4f8aff;--qa-glow:rgba(79,138,255,.25)" onclick="openNewMeetingModal()">
+        <div class="qa-icon">📹</div>
+        <div class="qa-title">פגישה חדשה</div>
+        <div class="qa-desc">פתח חדר מיידי ושתף את הקישור עם אחרים</div>
+      </button>
+      <button type="button" class="qa-card" style="--qa-color:#00e5a0;--qa-glow:rgba(0,229,160,.2)" onclick="openJoinModal()">
+        <div class="qa-icon">🔗</div>
+        <div class="qa-title">הצטרף לפגישה</div>
+        <div class="qa-desc">הזן קוד פגישה או קישור שקיבלת</div>
+      </button>
+      <button type="button" class="qa-card" style="--qa-color:#ffcc00;--qa-glow:rgba(255,204,0,.2)" onclick="openScheduleModal()">
+        <div class="qa-icon">📅</div>
+        <div class="qa-title">תזמן פגישה</div>
+        <div class="qa-desc">קבע פגישה עתידית ושלח הזמנות</div>
+      </button>
+    </div>
+    <div class="section-head">פגישות מתוכננות</div>
+    <div class="meetings-list" id="meetings-list">
+      <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">אין פגישות מתוכננות</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROOM -->
+<div class="page" id="room-page">
+  <!-- HEADER -->
+  <div class="room-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="room-title" id="room-title">פגישה</div>
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)"></div>
+      <div style="font-size:11px;color:var(--muted)" id="participant-count-label">1 משתתף</div>
+    </div>
+    <button type="button" class="room-id" onclick="copyRoomId()" style="background:none;border:none;font-family:'Heebo',sans-serif;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:6px">
+      🔑 <span id="room-code-display" style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:var(--cyan)"></span>
+    </button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="room-timer" id="room-timer">00:00</div>
+      <button type="button" onclick="openSettings()" style="display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;font-family:'Heebo',sans-serif;font-size:12px;font-weight:700;cursor:pointer">
+        ⚙️ <span>הגדרות</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="room-body">
+    <!-- GRID WRAP -->
+    <div class="video-grid-wrap">
+      <div class="video-area p1" id="video-grid"></div>
+    </div>
+
+    <!-- PARTICIPANTS SIDEBAR (top right) -->
+    <div class="participants-sidebar" id="participants-sidebar">
+      <div class="psb-title">👥 משתתפים</div>
+      <div id="psb-list"></div>
+    </div>
+
+    <!-- CHAT (bottom left, floating) -->
+    <div class="chat-panel hidden" id="chat-panel">
+      <div class="chat-head">
+        <span>💬 צ'אט</span>
+        <div id="chat-locked-badge" style="display:none;font-size:10px;background:rgba(255,77,106,.15);color:var(--red);border:1px solid var(--red);border-radius:6px;padding:2px 7px">🔒 נעול</div>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div style="text-align:center;color:var(--muted);font-size:11px;padding:10px">הפגישה התחילה</div>
+      </div>
+      <div class="chat-input-area" id="chat-input-area">
+        <input class="chat-field" placeholder="כתוב הודעה..." id="chat-input" onkeydown="handleChatKey(event)" />
+        <button type="button" class="send-btn" onclick="sendMessage()" style="touch-action:manipulation">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS (bottom center) -->
+  <div class="room-controls">
+    <div class="ctrl-wrap">
+      <button type="button" class="ctrl-btn" id="mic-btn" onclick="toggleMic()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <div class="ctrl-label" id="mic-label">השתק</div>
+    </div>
+    <div class="ctrl-wrap">
+      <button type="button" class="ctrl-btn" id="cam-btn" onclick="toggleCam()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </button>
+      <div class="ctrl-label" id="cam-label">מצלמה</div>
+    </div>
+    <div class="ctrl-wrap" id="screen-btn-wrap">
+      <button type="button" class="ctrl-btn" id="screen-btn" onclick="toggleScreen()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </button>
+      <div class="ctrl-label">שיתוף</div>
+    </div>
+    <!-- Flip camera — mobile only -->
+    <div class="ctrl-wrap" id="flip-cam-wrap" style="display:none">
+      <button type="button" class="ctrl-btn" id="flip-btn" onclick="flipCamera()">
+        🔄
+      </button>
+      <div class="ctrl-label">הפוך</div>
+    </div>
+    <div class="ctrl-wrap">
+      <button type="button" class="ctrl-btn" id="chat-btn" onclick="toggleChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <div class="ctrl-label">צ'אט</div>
+    </div>
+    <div class="ctrl-wrap">
+      <button type="button" class="ctrl-btn" id="participants-btn" onclick="toggleParticipants()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+      <div class="ctrl-label">משתתפים</div>
+    </div>
+    <!-- ADMIN BUTTON (host only) -->
+    <div class="ctrl-wrap" id="admin-btn-wrap" style="display:none">
+      <button type="button" class="ctrl-btn" onclick="toggleAdminPanel()" id="admin-panel-btn" style="border-color:#f59e0b">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </button>
+      <div class="ctrl-label" style="color:#f59e0b">מנהל</div>
+    </div>
+    <!-- Settings button in room -->
+    <div class="ctrl-wrap">
+      <button type="button" class="ctrl-btn" onclick="openSettings()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <div class="ctrl-label">הגדרות</div>
+    </div>
+    <!-- Raise Hand -->
+    <div class="ctrl-wrap">
+      <button type="button" class="ctrl-btn" id="hand-btn" onclick="toggleRaiseHand()">
+        ✋
+      </button>
+      <div class="ctrl-label" id="hand-label">הצבע</div>
+    </div>
+    <!-- Emoji reactions -->
+    <div class="ctrl-wrap" style="position:relative">
+      <button type="button" class="ctrl-btn" id="emoji-btn" onclick="toggleEmojiPicker()">
+        😀
+      </button>
+      <div class="ctrl-label">תגובה</div>
+      <!-- Emoji picker -->
+      <div id="emoji-picker" style="display:none;position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:12px;gap:8px;width:240px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.8);flex-wrap:wrap;justify-content:center">
+        <button type="button" onclick="sendEmoji('👍')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">👍</button>
+        <button type="button" onclick="sendEmoji('❤️')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">❤️</button>
+        <button type="button" onclick="sendEmoji('😂')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">😂</button>
+        <button type="button" onclick="sendEmoji('😮')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">😮</button>
+        <button type="button" onclick="sendEmoji('👏')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">👏</button>
+        <button type="button" onclick="sendEmoji('🔥')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">🔥</button>
+        <button type="button" onclick="sendEmoji('🎉')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">🎉</button>
+        <button type="button" onclick="sendEmoji('😢')" style="font-size:22px;background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;touch-action:manipulation">😢</button>
+      </div>
+    </div>
+    <div style="width:1px;height:32px;background:var(--border);margin:0 4px;flex-shrink:0"></div>
+    <button type="button" class="end-btn" onclick="endCall()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      סיים
+    </button>
+  </div>
+</div>
+
+<!-- Fixed mic button bottom-left -->
+<button type="button" id="mic-btn-fixed" onclick="toggleMic()" style="display:none">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+</button>
+
+<!-- Fixed cam button bottom-right -->
+<button type="button" id="cam-btn-fixed" onclick="toggleCam()" style="display:none">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+</button>
+
+<!-- ADMIN PANEL (floating) -->
+<div id="admin-panel">
+  <div style="font-size:14px;font-weight:800;color:#f59e0b;margin-bottom:14px">⭐ לוח מנהל</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <button type="button" id="mute-all-btn" onclick="muteAll()" class="admin-btn" style="background:rgba(255,77,106,.12);border:1px solid var(--red);color:var(--red)">🔇 השתק את כולם</button>
+    <button type="button" onclick="toggleChatLock()" id="chat-lock-btn" class="admin-btn" style="background:rgba(245,158,11,.1);border:1px solid #f59e0b;color:#f59e0b">🔒 נעל צ'אט</button>
+    <button type="button" onclick="openKickModal()" class="admin-btn" style="background:rgba(99,102,241,.1);border:1px solid #6366f1;color:#a5b4fc">👤 הוצא משתתף</button>
+    <button type="button" onclick="openSpeakModal()" class="admin-btn" style="background:rgba(0,229,160,.1);border:1px solid var(--green);color:var(--green)">🎙️ נהל הרשאות דיבור</button>
+    <button type="button" onclick="openPromoteModal()" class="admin-btn" style="background:rgba(79,138,255,.1);border:1px solid var(--blue);color:var(--blue)">⭐ הוסף מנהל</button>
+    <button type="button" onclick="openScreenShareModal()" class="admin-btn" style="background:rgba(0,229,160,.08);border:1px solid var(--green);color:var(--green)">🖥️ הרשאות שיתוף מסך</button>
+    <button type="button" onclick="toggleEmojiLock()" id="emoji-lock-btn" class="admin-btn" style="background:rgba(255,204,0,.08);border:1px solid #ffcc00;color:#ffcc00">😀 אימוגים: פעיל</button>
+    <button type="button" onclick="toggleAdminPanel()" class="admin-btn" style="background:transparent;border:1px solid var(--border);color:var(--muted);text-align:center;margin-top:4px">✕ סגור</button>
+
+  </div>
+</div>
+
+<!-- KICK MODAL -->
+<div class="modal-overlay" id="kick-modal">
+  <div class="modal-box" style="width:420px">
+    <button type="button" class="modal-close" onclick="closeModal('kick-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">👤 הוצא משתתף</div>
+    <div class="modal-sub">בחר את המשתתף שברצונך להוציא מהפגישה</div>
+    <div id="kick-list"></div>
+  </div>
+</div>
+
+<!-- SPEAK MODAL -->
+<div class="modal-overlay" id="speak-modal">
+  <div class="modal-box" style="width:420px">
+    <button type="button" class="modal-close" onclick="closeModal('speak-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">🎙️ הרשאות דיבור</div>
+    <div class="modal-sub">כאשר כולם מושתקים — בחר מי מורשה לדבר</div>
+    <div id="speak-list"></div>
+    <button type="button" class="cta-btn" style="margin-top:12px" onclick="closeModal('speak-modal')">סגור</button>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="new-meeting-modal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="closeModal('new-meeting-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">📹 פגישה חדשה</div>
+    <div class="modal-sub">הגדר את פרטי הפגישה</div>
+    <div class="modal-label">שם הפגישה</div>
+    <input class="field" placeholder='לדוגמה: "Daily Stand-up"' id="new-room-name" style="margin-bottom:18px" />
+    <button type="button" class="cta-btn" onclick="startNewMeeting()">🚀 פתח פגישה עכשיו</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="schedule-modal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="closeModal('schedule-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">📅 תזמן פגישה</div>
+    <div class="modal-sub">קבע פגישה עתידית ושלח הזמנות לאנשי קשר</div>
+    <div class="modal-label">שם הפגישה</div>
+    <input class="field" placeholder='לדוגמה: "סקירת Q3"' id="sched-name" style="margin-bottom:16px" />
+    <div class="modal-label">תאריך</div>
+    <input class="field" type="date" id="sched-date" style="margin-bottom:16px" />
+    <div class="modal-label">שעה</div>
+    <input class="field" type="time" id="sched-time" style="margin-bottom:16px" />
+    <div class="modal-label">הזמן משתתפים (לפי שם באתר)</div>
+    <div style="position:relative;margin-bottom:8px">
+      <input class="field" placeholder="חפש שם משתמש..." id="sched-guest-search" oninput="searchUsers(this.value)" style="margin-bottom:0" autocomplete="off" />
+      <div id="user-search-results" style="display:none;position:absolute;top:100%;right:0;left:0;background:var(--s1);border:1px solid var(--border);border-radius:10px;z-index:100;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)"></div>
+    </div>
+    <div id="invited-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px"></div>
+    <button type="button" class="cta-btn" onclick="schedMeeting()">📅 תזמן פגישה</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="join-modal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" onclick="closeModal('join-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">🔗 הצטרף לפגישה</div>
+    <div class="modal-sub">הכנס קוד פגישה שקיבלת</div>
+    <div class="modal-label">קוד פגישה</div>
+    <input class="field" placeholder="AXYZ-789" id="join-code" style="margin-bottom:24px;letter-spacing:2px;text-align:center;font-family:'JetBrains Mono',monospace" />
+    <div id="join-code-error" style="display:none;color:var(--red);font-size:13px;text-align:center;margin-bottom:8px;font-weight:700"></div>
+    <button type="button" class="cta-btn" onclick="joinByCode()">הצטרף לפגישה</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// PARTICLES BG
+// ══════════════════════════════════════════
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let ps=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  for(let i=0;i<60;i++) ps.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.5+.3,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,a:Math.random()*.4+.05});
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height; if(p.y>c.height)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(79,138,255,${p.a})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ══════════════════════════════════════════
+// STORAGE — localStorage (works with file://)
+// ══════════════════════════════════════════
+function lsGet(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e){ return null; }
+}
+function lsSet(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch(e){}
+}
+
+// ══════════════════════════════════════════
+// EMAIL VALIDATION — strict real-email check
+// ══════════════════════════════════════════
+function isValidEmail(email) {
+  return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email.trim());
+}
+
+// ══════════════════════════════════════════
+// REGISTERED ACCOUNTS (localStorage)
+// ══════════════════════════════════════════
+function getAccounts() { return lsGet('zoomAccounts') || []; }
+function saveAccounts(arr) { lsSet('zoomAccounts', arr); }
+function findAccount(email) {
+  return getAccounts().find(a => a.email.toLowerCase() === email.toLowerCase().trim());
+}
+
+// ══════════════════════════════════════════
+// CURRENT USER (localStorage)
+// ══════════════════════════════════════════
+let currentUser = lsGet('zoomCurrentUser') || null;
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let micOn=false, camOn=false, screenOn=false, chatOpen=false;
+let timerSec=0, timerInt=null;
+let localStream=null, camStream=null, screenStream=null;
+const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+let selectedMicId = null, selectedCamId = null;
+let isHost=false, chatLocked=false;
+let allowedToSpeak = {}; // participantId -> bool (if mute-all is active)
+let roomParticipants=[];
+let participantsOpen=false;
+let adminPanelOpen=false;
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+let toastT;
+function showToast(msg, duration){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  // Force reflow so transition fires even if called rapidly
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>{
+    t.classList.remove('show');
+  }, duration||2500);
+}
+
+// ══════════════════════════════════════════
+// GOOGLE ACCOUNTS POPUP — dynamic, cookie-based, with password
+// ══════════════════════════════════════════
+const GOOGLE_COLORS = ['#4285F4','#34A853','#EA4335','#9333ea','#f59e0b','#06b6d4'];
+let _pendingGoogleAcc = null;
+
+function getGoogleAccounts() { return lsGet('zoomGoogleAccounts') || []; }
+function saveGoogleAccounts(arr) { lsSet('zoomGoogleAccounts', arr); }
+
+function loginWithGoogle() {
+  renderGoogleAccountsList();
+  hideAddForm();
+  hidePassForm();
+  document.getElementById('google-popup').classList.add('open');
+}
+
+function closeGooglePopup() {
+  document.getElementById('google-popup').classList.remove('open');
+  hideAddForm();
+  hidePassForm();
+}
+function hideAddForm() {
+  document.getElementById('add-google-form').style.display='none';
+  document.getElementById('add-google-error').style.display='none';
+  document.getElementById('new-google-name').value='';
+  document.getElementById('new-google-email').value='';
+  document.getElementById('new-google-pass').value='';
+  document.getElementById('new-google-photo').value='';
+  document.getElementById('photo-preview').innerHTML='👤';
+  document.getElementById('photo-preview').style.background='#e5e7eb';
+  window._newGooglePhoto = null;
+}
+
+// Preset photos from Unsplash (small, free, nature/objects)
+// All illustrations are inline SVG — cartoon/drawn style, no real photos
+const PRESET_PHOTOS = [
+  // אוכל
+  { label:'🍕', bg:'#FFF3E0' }, { label:'🍔', bg:'#FBE9E7' },
+  { label:'🍰', bg:'#FCE4EC' }, { label:'☕', bg:'#EFEBE9' },
+  { label:'🍩', bg:'#FFF8E1' }, { label:'🍣', bg:'#E8F5E9' },
+  { label:'🥑', bg:'#F1F8E9' }, { label:'🧁', bg:'#FCE4EC' },
+  { label:'🍜', bg:'#FFF9C4' }, { label:'🌮', bg:'#FFF3E0' },
+  { label:'🍦', bg:'#E3F2FD' }, { label:'🧇', bg:'#FFF8E1' },
+  // ספורט
+  { label:'⚽', bg:'#E8F5E9' }, { label:'🏀', bg:'#FFF3E0' },
+  { label:'🎾', bg:'#F9FBE7' }, { label:'🏊', bg:'#E3F2FD' },
+  { label:'🚴', bg:'#F3E5F5' }, { label:'🏋️', bg:'#EFEBE9' },
+  { label:'⛷️', bg:'#E1F5FE' }, { label:'🥊', bg:'#FFEBEE' },
+  { label:'🎯', bg:'#FFF8E1' }, { label:'🏄', bg:'#E0F7FA' },
+  { label:'🤸', bg:'#F3E5F5' }, { label:'🏇', bg:'#FBE9E7' },
+  // חפצים
+  { label:'🎧', bg:'#EDE7F6' }, { label:'📷', bg:'#E3F2FD' },
+  { label:'📚', bg:'#FFF8E1' }, { label:'🎨', bg:'#FCE4EC' },
+  { label:'💻', bg:'#E8EAF6' }, { label:'🎮', bg:'#E8F5E9' },
+  { label:'🎸', bg:'#FFF3E0' }, { label:'🚀', bg:'#EDE7F6' },
+]
+
+function svgToDataUrl(svgString) {
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+}
+
+function makeTileDataUrl(emoji, bg) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+    <rect width="200" height="200" rx="16" fill="${bg}"/>
+    <text x="100" y="115" font-size="96" text-anchor="middle"
+      font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">${emoji}</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+function renderPresetPhotos() {
+  const grid = document.getElementById('preset-photos');
+  if(!grid) return;
+  grid.innerHTML = '';
+  PRESET_PHOTOS.forEach((p, i) => {
+    const dataUrl = makeTileDataUrl(p.label, p.bg);
+    const btn = document.createElement('div');
+    btn.id = 'preset-' + i;
+    btn.title = p.label;
+    btn.style.cssText = `width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,.12)`;
+    btn.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;display:block">`;
+    btn.onclick = () => selectPresetPhoto(dataUrl, p, i);
+    grid.appendChild(btn);
+  });
+}
+
+function selectPresetPhoto(dataUrl, p, idx) {
+  window._newGooglePhoto = dataUrl;
+  const prev = document.getElementById('photo-preview');
+  prev.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  prev.style.background = 'transparent';
+  document.querySelectorAll('[id^=preset-]').forEach(el => { el.style.borderColor='transparent'; el.style.transform=''; });
+  const sel = document.getElementById('preset-' + idx);
+  if(sel) { sel.style.borderColor='#4285F4'; sel.style.transform='scale(1.1)'; }
+  document.getElementById('new-google-photo').value = '';
+}
+
+function previewProfilePhoto(input) {
+  if(!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    window._newGooglePhoto = e.target.result;
+    const prev = document.getElementById('photo-preview');
+    prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    prev.style.background = 'transparent';
+  };
+  reader.readAsDataURL(file);
+}
+function hidePassForm() {
+  document.getElementById('google-pass-form').style.display='none';
+  document.getElementById('google-pass-error').style.display='none';
+  document.getElementById('google-pass-input').value='';
+  _pendingGoogleAcc = null;
+}
+
+function renderGoogleAccountsList() {
+  const list = document.getElementById('google-accounts-list');
+  list.innerHTML = '';
+  const saved = getGoogleAccounts();
+
+  if(saved.length > 0) {
+    saved.forEach(acc => {
+      // Use <button> so iOS Safari fires click reliably
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'gp-account'; el.setAttribute('type','button');
+      el.style.cssText = 'position:relative;padding-left:36px;width:100%;-webkit-appearance:none;appearance:none;background:none;text-align:right;font-family:Heebo,sans-serif;touch-action:manipulation';
+      const initial = (acc.name||'?')[0].toUpperCase();
+      el.innerHTML = `
+        <div class="gp-acc-av" style="background:${acc.color||'#4285F4'}">${initial}</div>
+        <div style="flex:1">
+          <div class="gp-acc-name">${acc.name}</div>
+          <div class="gp-acc-email">${acc.email}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();deleteGoogleAccount('${acc.email}')"
+          style="width:28px;height:28px;border-radius:50%;background:#fee2e2;color:#ef4444;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;touch-action:manipulation;border:none;-webkit-appearance:none">🗑</button>`;
+      el.addEventListener('click', (e) => { if(!e.target.closest('span')) promptGooglePass(acc); });
+      list.appendChild(el);
+    });
+  }
+
+  // "Create new account" button — real <button> for iOS
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px dashed #d1d5db;border-radius:12px;cursor:pointer;margin-top:8px;width:100%;color:#4285F4;font-weight:700;font-size:14px;background:transparent;font-family:Heebo,sans-serif;-webkit-appearance:none;appearance:none;touch-action:manipulation';
+  addBtn.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:#f0f4ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#4285F4;font-weight:900">+</div><div>צור חשבון חדש</div>';
+  addBtn.addEventListener('click', () => {
+    hidePassForm();
+    document.getElementById('add-google-form').style.display='block';
+    renderPresetPhotos();
+    document.getElementById('new-google-name').focus();
+  });
+  list.appendChild(addBtn);
+}
+
+function deleteGoogleAccount(email) {
+  if(!confirm(`למחוק את החשבון ${email}?`)) return;
+  let saved = getGoogleAccounts();
+  saved = saved.filter(a => a.email.toLowerCase() !== email.toLowerCase());
+  saveGoogleAccounts(saved);
+  renderGoogleAccountsList();
+  showToast('🗑️ החשבון נמחק');
+}
+
+// Show password prompt for existing account
+function promptGooglePass(acc) {
+  _pendingGoogleAcc = acc;
+  hideAddForm();
+  document.getElementById('google-pass-label').textContent = 'הכנס סיסמה עבור ' + acc.name;
+  document.getElementById('google-pass-error').style.display='none';
+  document.getElementById('google-pass-input').value='';
+  document.getElementById('google-pass-form').style.display='block';
+  document.getElementById('google-pass-input').focus();
+}
+
+function confirmGooglePass() {
+  if(!_pendingGoogleAcc) return;
+  const pass = document.getElementById('google-pass-input').value;
+  const errEl = document.getElementById('google-pass-error');
+  errEl.style.display='none';
+  if(!pass) { errEl.textContent='יש להזין סיסמה'; errEl.style.display='block'; return; }
+  if(pass !== _pendingGoogleAcc.password) {
+    errEl.textContent='סיסמה שגויה'; errEl.style.display='block'; return;
+  }
+  const acc = _pendingGoogleAcc;
+  closeGooglePopup();
+  currentUser = {name: acc.name, email: acc.email, color: acc.color, photo: acc.photo||null};
+  lsSet('zoomCurrentUser', currentUser);
+  applyUserToUI();
+  showPage('lobby-page');
+  showToast('✅ התחברת בהצלחה!');
+  if(!lsGet('zoomPermissionsSet')) document.getElementById('perm-banner').style.display='block';
+}
+
+function confirmAddGoogleAccount() {
+  const nameEl  = document.getElementById('new-google-name');
+  const emailEl = document.getElementById('new-google-email');
+  const passEl  = document.getElementById('new-google-pass');
+  const errEl   = document.getElementById('add-google-error');
+  const name  = nameEl.value.trim();
+  const email = emailEl.value.trim();
+  const pass  = passEl.value;
+  errEl.style.display = 'none';
+
+  if(!name)  { errEl.textContent='יש להזין שם מלא'; errEl.style.display='block'; nameEl.focus(); return; }
+  if(!isValidEmail(email)) { errEl.textContent='כתובת האימייל אינה תקינה'; errEl.style.display='block'; emailEl.focus(); return; }
+  if(!pass || pass.length < 6) { errEl.textContent='הסיסמה חייבת להכיל לפחות 6 תווים'; errEl.style.display='block'; passEl.focus(); return; }
+
+  const saved = getGoogleAccounts();
+  // Check duplicate email
+  const dupEmail = saved.find(a => a.email.toLowerCase() === email.toLowerCase());
+  if(dupEmail) {
+    errEl.textContent = '❌ אימייל זהה — אי אפשר ליצור משתמש';
+    errEl.style.display = 'block';
+    // Notify existing user
+    showToast('⚠️ מישהו ניסה להירשם עם האימייל שלך!');
+    return;
+  }
+  // Check duplicate name
+  const dupName = saved.find(a => a.name.toLowerCase() === name.toLowerCase());
+  if(dupName) {
+    errEl.textContent = '❌ שם זהה — אי אפשר ליצור משתמש';
+    errEl.style.display = 'block'; return;
+  }
+  // Check duplicate password
+  const dupPass = saved.find(a => a.password === pass);
+  if(dupPass) {
+    errEl.textContent = '❌ סיסמה זהה — אי אפשר ליצור משתמש';
+    errEl.style.display = 'block'; return;
+  }
+
+  const color = GOOGLE_COLORS[saved.length % GOOGLE_COLORS.length];
+  const photo = window._newGooglePhoto || null;
+  const newAcc = {name, email, password: pass, color, photo};
+  saved.push(newAcc);
+  saveGoogleAccounts(saved);
+
+  hideAddForm();
+  // Immediately log in
+  currentUser = {name, email, color, photo};
+  lsSet('zoomCurrentUser', currentUser);
+  document.getElementById('google-popup').classList.remove('open');
+  applyUserToUI();
+  showPage('lobby-page');
+  renderMeetingsList();
+  if(!lsGet('zoomPermissionsSet')) document.getElementById('perm-banner').style.display='block';
+  showToast('✅ חשבון נוצר בהצלחה! 🎉');
+}
+
+// ══════════════════════════════════════════
+// MANUAL LOGIN — only existing accounts (created via Google popup)
+// ══════════════════════════════════════════
+function loginManual() {
+  const emailEl = document.getElementById('email-field');
+  const passEl  = document.getElementById('pass-field');
+  const errEl   = document.getElementById('login-error');
+  const email   = emailEl.value.trim();
+  const pass    = passEl.value;
+
+  errEl.style.display='none';
+  emailEl.classList.remove('error'); passEl.classList.remove('error');
+
+  if(!email) {
+    showError(emailEl, errEl, 'יש להזין כתובת אימייל'); return;
+  }
+  if(!isValidEmail(email)) {
+    showError(emailEl, errEl, 'כתובת האימייל אינה תקינה'); return;
+  }
+  if(!pass) {
+    showError(passEl, errEl, 'יש להזין סיסמה'); return;
+  }
+
+  // Look in both Google accounts and manual accounts
+  const googleAccs = getGoogleAccounts();
+  const manualAccs = getAccounts();
+  const allAccounts = [...googleAccs, ...manualAccs];
+  const existing = allAccounts.find(a => a.email.toLowerCase() === email.toLowerCase());
+
+  if(!existing) {
+    showError(emailEl, errEl, 'חשבון לא קיים — צור חשבון חדש דרך כפתור Google למעלה'); return;
+  }
+  if(existing.password !== pass) {
+    showError(passEl, errEl, 'סיסמה שגויה'); return;
+  }
+
+  currentUser = {name: existing.name, email: existing.email, color: existing.color || '#4f8aff'};
+  lsSet('zoomCurrentUser', currentUser);
+  applyUserToUI();
+  showPage('lobby-page');
+  renderMeetingsList();
+  showToast(`ברוכים הבאים, ${currentUser.name.split(' ')[0]}! 🎉`);
+}
+
+function showError(field, errEl, msg) {
+  field.classList.add('error');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+}
+
+function applyUserToUI() {
+  const av = document.getElementById('user-avatar');
+  if(currentUser.photo) {
+    av.innerHTML = `<img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    av.style.background = 'transparent';
+    av.textContent = '';
+  } else {
+    av.innerHTML = '';
+    av.textContent = (currentUser.name||'?')[0].toUpperCase();
+    av.style.background = currentUser.color || '#4f8aff';
+  }
+  document.getElementById('user-name').textContent = currentUser.name;
+  document.getElementById('hero-name').textContent = (currentUser.name||'').split(' ')[0];
+}
+
+// Auto-fill email if returning user (don't auto-login for security)
+// Auto-login if user is saved
+if(currentUser && currentUser.email) {
+  document.addEventListener('DOMContentLoaded', function(){
+    applyUserToUI();
+    showPage('lobby-page');
+    if(!lsGet('zoomPermissionsSet')) document.getElementById('perm-banner').style.display='block';
+  });
+}
+
+// ══════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════
+// render meetings on page load
+document.addEventListener('DOMContentLoaded', renderMeetingsList);
+
+function openScheduleModal(){
+  const d=new Date(); d.setDate(d.getDate()+1);
+  document.getElementById('sched-date').value=d.toISOString().split('T')[0];
+  document.getElementById('sched-time').value='10:00';
+  document.getElementById('schedule-modal').classList.add('open');
+}
+// ── Scheduled meetings stored in localStorage ──
+let scheduledMeetings = lsGet('zoomScheduled') || [];
+
+function renderMeetingsList() {
+  const list = document.getElementById('meetings-list');
+  if(!list) return;
+  if(scheduledMeetings.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">אין פגישות מתוכננות</div>';
+    return;
+  }
+  list.innerHTML = scheduledMeetings.map(m => {
+    const dateStr = new Date(m.date+'T'+m.time).toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});
+    return `<div class="meeting-row">
+      <div class="meeting-left">
+        <div class="meeting-dot future"></div>
+        <div>
+          <div class="meeting-name">${m.name}</div>
+          <div class="meeting-time">${dateStr} · ${m.time}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button type="button" class="join-btn" onclick="joinRoom('${m.name}')">הצטרף</button>
+        <button type="button" onclick="deleteMeeting('${m.id}')" style="width:28px;height:28px;border-radius:7px;background:rgba(255,77,106,.12);border:1px solid var(--red);color:var(--red);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;flex-shrink:0">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteMeeting(id) {
+  scheduledMeetings = scheduledMeetings.filter(m => m.id !== id);
+  lsSet('zoomScheduled', scheduledMeetings);
+  renderMeetingsList();
+  showToast('🗑 פגישה נמחקה');
+}
+
+var invitedUsers = [];
+
+function searchUsers(query) {
+  const results = document.getElementById('user-search-results');
+  if(!query.trim()) { results.style.display='none'; return; }
+  // Search saved accounts
+  const allAccounts = [...(lsGet('zoomAccounts')||[]), ...(lsGet('zoomGoogleAccounts')||[])];
+  const matches = allAccounts.filter(a =>
+    a.name && a.name.includes(query) && a.email !== (currentUser ? currentUser.email : '')
+    && !invitedUsers.find(u => u.email === a.email)
+  );
+  if(!matches.length) {
+    results.style.display='none';
+    return;
+  }
+  results.innerHTML = '';
+  matches.forEach(a => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;width:100%;background:none;border:none;cursor:pointer;font-family:Heebo,sans-serif;font-size:13px;color:var(--text);touch-action:manipulation;text-align:right';
+    btn.innerHTML = '<div style="width:28px;height:28px;border-radius:50%;background:'+(a.color||'#4f8aff')+';display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:12px;flex-shrink:0">'+(a.name[0]||'?')+'</div><span>'+a.name+'</span>';
+    btn.onclick = function() {
+      invitedUsers.push(a);
+      renderInvited();
+      document.getElementById('sched-guest-search').value = '';
+      results.style.display = 'none';
+    };
+    results.appendChild(btn);
+  });
+  results.style.display = 'block';
+}
+
+function renderInvited() {
+  const list = document.getElementById('invited-list');
+  list.innerHTML = '';
+  invitedUsers.forEach((u, i) => {
+    const tag = document.createElement('div');
+    tag.style.cssText = 'display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700';
+    tag.innerHTML = u.name + ' <button type="button" onclick="removeInvited('+i+')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;touch-action:manipulation">✕</button>';
+    list.appendChild(tag);
+  });
+}
+
+function removeInvited(i) {
+  invitedUsers.splice(i, 1);
+  renderInvited();
+}
+
+function schedMeeting(){
+  const name=document.getElementById('sched-name').value.trim();
+  const date=document.getElementById('sched-date').value;
+  const time=document.getElementById('sched-time').value;
+  if(!name){showToast('⚠️ הכנס שם לפגישה');return;}
+  if(!date||!time){showToast('⚠️ הכנס תאריך ושעה');return;}
+
+  const meeting = { id: Date.now().toString(), name, date, time, invited: invitedUsers.map(u=>u.name) };
+  scheduledMeetings.push(meeting);
+  lsSet('zoomScheduled', scheduledMeetings);
+  invitedUsers = [];
+  renderInvited();
+  closeModal('schedule-modal');
+  renderMeetingsList();
+  showToast('✅ הפגישה "' + name + '" תוזמנה!');
+}
+function openNewMeetingModal(){document.getElementById('new-meeting-modal').classList.add('open');}
+function openJoinModal(){document.getElementById('join-modal').classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+  m.addEventListener('touchend',e=>{if(e.target===m){e.preventDefault();m.classList.remove('open');}},{passive:false});
+});
+
+function startNewMeeting(){
+  const n=document.getElementById('new-room-name').value.trim()||'פגישה חדשה';
+  closeModal('new-meeting-modal');
+  joinRoom(n);
+}
+function joinByCode(){
+  const c=document.getElementById('join-code').value.trim().toUpperCase();
+  if(!c){showToast('⚠️ הכנס קוד פגישה');return;}
+  closeModal('join-modal');
+  joinRoom('פגישה', c);
+}
+
+// ══════════════════════════════════════════
+// JOIN ROOM — only real user, no bots
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// SPEAKING DETECTION — green border only when making sound
+// ══════════════════════════════════════════
+var _audioCtx = null, _analyser = null, _speakInterval = null;
+
+function startSpeakingDetection(stream) {
+  stopSpeakingDetection();
+  if(!stream || !stream.getAudioTracks().length) return;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    _analyser = _audioCtx.createAnalyser();
+    _analyser.fftSize = 512;
+    var src = _audioCtx.createMediaStreamSource(stream);
+    src.connect(_analyser);
+    var data = new Uint8Array(_analyser.frequencyBinCount);
+    _speakInterval = setInterval(function(){
+      if(!micOn) { stopSpeakingDetection(); return; }
+      _analyser.getByteFrequencyData(data);
+      var avg = 0;
+      for(var i=0;i<data.length;i++) avg += data[i];
+      avg = avg / data.length;
+      var selfTile = document.getElementById('tile-self');
+      if(selfTile) {
+        if(avg > 20) selfTile.classList.add('speaking');
+        else selfTile.classList.remove('speaking');
+      }
+    }, 100);
+  } catch(e) { console.log('speaking detection error:', e); }
+}
+
+function stopSpeakingDetection() {
+  if(_speakInterval) { clearInterval(_speakInterval); _speakInterval = null; }
+  if(_audioCtx) { try{_audioCtx.close();}catch(e){} _audioCtx = null; }
+  var selfTile = document.getElementById('tile-self');
+  if(selfTile) selfTile.classList.remove('speaking');
+}
+
+let currentRoomCode = '';
+
+function generateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  code += '-';
+  for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function joinRoom(name, code){
+  currentRoomCode = code || generateRoomCode();
+  document.getElementById('room-title').textContent = name;
+  document.getElementById('room-code-display').textContent = currentRoomCode;
+  isHost = true;
+  document.getElementById('admin-btn-wrap').style.display = 'flex';
+  setTimeout(function(){ if(typeof connectToServer==='function') connectToServer(currentRoomCode); }, 100);
+
+  // Show screen share only on desktop
+  const screenWrap = document.getElementById('screen-btn-wrap');
+  if(screenWrap) screenWrap.style.display = 'flex';
+
+  // Hide screen share on mobile
+  if(isMobile) { const sb = document.getElementById('screen-btn-wrap'); if(sb) sb.style.display='none'; }
+  // Start with mic and cam OFF
+  micOn = false;
+  camOn = false;
+  try { document.getElementById('mic-btn').classList.add('muted'); } catch(e){}
+  try { document.getElementById('mic-label').textContent = 'בטל השתקה'; } catch(e){}
+  try { document.getElementById('cam-btn').classList.remove('active'); } catch(e){}
+  try { document.getElementById('cam-label').textContent = 'מצלמה'; } catch(e){}
+
+  roomParticipants = [
+    {id:'self', name:currentUser.name, email:currentUser.email,
+     color:currentUser.color||'#4f8aff', emoji:currentUser.emoji||'',
+     photo:currentUser.photo||null,
+     muted:false, self:true, host:true, camOn:false}
+  ];
+
+  allowedToSpeak = { self: true };
+
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:11px;padding:10px">הפגישה התחילה 🎉 — ממתין למשתתפים...</div>';
+  chatLocked=false;
+  document.getElementById('chat-lock-btn').textContent="🔒 נעל צ'אט";
+  document.getElementById('chat-locked-badge').style.display='none';
+  document.getElementById('chat-input-area').style.display='flex';
+
+  renderGrid();
+  renderParticipantsSidebar();
+  startTimer();
+  // Show user avatar in room header
+  const roomAv = document.getElementById('room-user-avatar');
+  if(roomAv && currentUser) {
+    if(currentUser.photo) {
+      roomAv.innerHTML = `<img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover">`;
+      roomAv.style.background = 'transparent';
+    } else {
+      roomAv.textContent = (currentUser.name||'?')[0].toUpperCase();
+      roomAv.style.background = currentUser.color || 'var(--blue)';
+    }
+  }
+  showPage('room-page');
+}
+
+// ══════════════════════════════════════════
+// RENDER GRID
+// ══════════════════════════════════════════
+function renderGrid(){
+  const g = document.getElementById('video-grid');
+  const n = roomParticipants.length;
+  const MAX_TILES = 6;
+  const showOverflow = n > MAX_TILES;
+  const visible = showOverflow ? roomParticipants.slice(0, MAX_TILES - 1) : roomParticipants;
+  const hiddenOnes = showOverflow ? roomParticipants.slice(MAX_TILES - 1) : [];
+
+  const vn = visible.length;
+  const cls = 'p1';  // always 2-column grid
+  g.className = 'video-area ' + cls;
+  g.innerHTML = '';
+
+  visible.forEach(p => {
+    const tile = document.createElement('div');
+    tile.className = 'vtile' + (p.self?' self':'') + (p.muted?' muted-tile':'');
+    tile.id = 'tile-' + p.id;
+
+    // Camera-off display: full photo or avatar circle
+    let camOffHtml;
+    if(p.photo) {
+      // Full tile profile image
+      camOffHtml = `<div class="tile-cam-off has-photo" id="camoff-${p.id}">
+        <img class="tile-profile-img" src="${p.photo}" alt="${p.name}">
+      </div>`;
+    } else {
+      // Emoji or initials circle
+      let avatarContent;
+      if(p.emoji) {
+        avatarContent = `<span style="font-size:26px">${p.emoji}</span>`;
+      } else {
+        const initials = p.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+        avatarContent = `<span style="font-size:20px;font-weight:900">${initials}</span>`;
+      }
+      camOffHtml = `<div class="tile-cam-off" id="camoff-${p.id}">
+        <div class="tile-avatar" style="background:${p.color}" id="avatar-${p.id}">${avatarContent}</div>
+      </div>`;
+    }
+
+    tile.innerHTML = `
+      ${camOffHtml}
+      <video id="video-${p.id}" autoplay ${p.self?'muted':''} playsinline></video>
+      <div class="tile-namebar">
+        <div class="tile-name">${p.self ? 'את/ה' : p.name}</div>
+        <div class="tile-badges">
+          ${p.host ? '<span class="badge badge-admin">👑</span>' : ''}
+          ${p.muted ? `<span class="badge badge-muted" id="muted-badge-${p.id}">🔇</span>` : `<span class="badge badge-muted" id="muted-badge-${p.id}" style="display:none">🔇</span>`}
+          <span id="hand-badge-${p.id}" style="display:none;background:rgba(255,204,0,.9);color:#000;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:900">✋ <span id="hand-pos-${p.id}">1</span></span>
+        </div>
+      </div>`;
+    g.appendChild(tile);
+
+    // If this is self and cam is on, reattach stream
+    if(p.self && camStream) {
+      const vid = document.getElementById('video-self');
+      if(vid){vid.srcObject=camStream;vid.style.display='block';vid.classList.add('active');document.getElementById('camoff-self').style.display='none';}
+    }
+  });
+
+  // Overflow combined tile
+  if(showOverflow && hiddenOnes.length > 0) {
+    const ot = document.createElement('div');
+    ot.className = 'vtile vtile-overflow';
+    const ogrid = document.createElement('div');
+    ogrid.className = 'overflow-grid';
+    // Show up to 4 mini-avatars
+    hiddenOnes.slice(0,4).forEach(p => {
+      const av = document.createElement('div');
+      av.className = 'overflow-av';
+      av.style.background = p.color || '#4f8aff';
+      if(p.photo) av.innerHTML = `<img src="${p.photo}" alt="${p.name}">`;
+      else if(p.emoji) av.innerHTML = `<span style="font-size:14px">${p.emoji}</span>`;
+      else av.innerHTML = `<span style="font-size:13px;font-weight:900">${p.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</span>`;
+      ogrid.appendChild(av);
+    });
+    ot.appendChild(ogrid);
+    const cnt = document.createElement('div');
+    cnt.className = 'overflow-count';
+    cnt.textContent = `+${hiddenOnes.length} משתתפים`;
+    ot.appendChild(cnt);
+    g.appendChild(ot);
+  }
+
+  document.getElementById('participant-count-label').textContent = `${n} משתתפים`;
+  renderParticipantsSidebar();
+}
+
+// ══════════════════════════════════════════
+// PARTICIPANTS SIDEBAR
+// ══════════════════════════════════════════
+function getSortedParticipants() {
+  // Sort: self first, then admins, then hand-raisers (by time), then rest
+  const sorted = [...roomParticipants];
+  sorted.sort((a, b) => {
+    if(a.self) return -1;
+    if(b.self) return 1;
+    if(a.host && !b.host) return -1;
+    if(!a.host && b.host) return 1;
+    // Hand raisers - earlier time = higher up
+    const aHand = handQueue.findIndex(h => h.id === a.id);
+    const bHand = handQueue.findIndex(h => h.id === b.id);
+    if(aHand !== -1 && bHand === -1) return -1;
+    if(aHand === -1 && bHand !== -1) return 1;
+    if(aHand !== -1 && bHand !== -1) return aHand - bHand;
+    return 0;
+  });
+  return sorted;
+}
+
+function renderParticipantsSidebar(){
+  const list = document.getElementById('psb-list');
+  list.innerHTML = '';
+
+  // ── תור הצבעות ──
+  if(handQueue.length > 0) {
+    const section = document.createElement('div');
+    section.style.cssText = 'background:rgba(255,204,0,.1);border:1px solid rgba(255,204,0,.3);border-radius:10px;padding:8px 10px;margin-bottom:8px';
+    section.innerHTML = '<div style="font-size:10px;font-weight:800;color:#ffcc00;margin-bottom:6px">✋ תור הצבעות</div>';
+    handQueue.forEach((h, i) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:3px 0';
+      row.innerHTML = '<span style="background:#ffcc00;color:#000;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0">'+(i+1)+'</span><span style="font-size:12px;font-weight:700">'+h.name+'</span>';
+      section.appendChild(row);
+    });
+    list.appendChild(section);
+  }
+
+  // ── משתתפים ──
+  const sorted = [...roomParticipants].sort((a,b) => {
+    if(a.host && !b.host) return -1;
+    if(!a.host && b.host) return 1;
+    if(a.self) return -1;
+    if(b.self) return 1;
+    return 0;
+  });
+  sorted.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'psb-item';
+    let avHtml;
+    if(p.photo) avHtml = '<div class="psb-av"><img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>';
+    else {
+      const initials = p.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+      avHtml = '<div class="psb-av" style="background:'+(p.color||'#4f8aff')+'">'+initials+'</div>';
+    }
+    const handPos = handQueue.findIndex(h=>h.id===p.id);
+    const handBadge = handPos!==-1 ? '<span style="background:#ffcc00;color:#000;border-radius:6px;padding:1px 5px;font-size:10px;font-weight:900">✋'+(handPos+1)+'</span>' : '';
+    const hostBadge = p.host ? '👑' : '';
+    const mutedBadge = p.muted ? '🔇' : '';
+    if(p.self) item.classList.add('psb-self');
+    item.innerHTML = avHtml+'<div class="psb-name">'+p.name+(p.self?' (את/ה)':'')+'</div><div class="psb-icons">'+handBadge+mutedBadge+hostBadge+'</div>';
+    list.appendChild(item);
+  });
+}
+
+function toggleParticipants(){
+  participantsOpen = !participantsOpen;
+  const sb = document.getElementById('participants-sidebar');
+  sb.classList.toggle('show', participantsOpen);
+  document.getElementById('participants-btn').classList.toggle('active', participantsOpen);
+}
+
+// Speaking simulation removed — no bots
+
+// ══════════════════════════════════════════
+// MIC (REAL)
+// ══════════════════════════════════════════
+async function toggleMic(){
+  const btn=document.getElementById('mic-btn');
+  const lbl=document.getElementById('mic-label');
+  if(!localStream){
+    try {
+      const audioConstraints = selectedMicId
+        ? { deviceId: { exact: selectedMicId }, echoCancellation:true, noiseSuppression:true }
+        : { echoCancellation:true, noiseSuppression:true };
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints, video: false });
+      // Mark as approved so we don't ask again
+      settingsState.mic = true;
+    } catch(e){
+      // Check if already approved in settings
+      if(settingsState.mic) {
+        showToast('⚠️ המיקרופון לא זמין כרגע');
+      } else {
+        
+      }
+      return;
+    }
+  }
+  micOn = !micOn;
+  localStream.getAudioTracks().forEach(t=>t.enabled=micOn);
+  btn.classList.toggle('muted',!micOn);
+  lbl.textContent = micOn ? 'השתק' : 'בטל השתקה';
+  showToast(micOn ? '🎙️ מיקרופון פעיל' : '🔇 מושתק');
+
+  const selfP = roomParticipants.find(p=>p.self);
+  if(selfP){ selfP.muted = !micOn; }
+  const badge = document.getElementById('muted-badge-self');
+  if(badge) badge.style.display = micOn ? 'none' : '';
+  const selfTile = document.getElementById('tile-self');
+  if(selfTile){
+    selfTile.classList.toggle('muted-tile',!micOn);
+    selfTile.classList.remove('speaking'); // never add speaking here - only AudioContext does that
+  }
+  // Start/stop speaking detection based on mic state
+  if(micOn && localStream) {
+    startSpeakingDetection(localStream);
+  } else {
+    stopSpeakingDetection();
+  }
+  renderParticipantsSidebar();
+}
+
+// ══════════════════════════════════════════
+// CAMERA (REAL)
+// ══════════════════════════════════════════
+async function toggleCam(){
+  const btn=document.getElementById('cam-btn');
+  const lbl=document.getElementById('cam-label');
+
+  if(!camOn){
+    try {
+      // Mobile-friendly camera constraints
+      const videoConstraints = selectedCamId
+        ? { deviceId: { exact: selectedCamId } }
+        : (isMobileDevice ? { facingMode: currentFacingMode, width:{ideal:640}, height:{ideal:480} } : { width:{ideal:1280}, height:{ideal:720} });
+      try {
+        camStream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false });
+      } catch(e2) {
+        camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      }
+      const vid = document.getElementById('video-self');
+      const camOff = document.getElementById('camoff-self');
+      if(vid){
+        vid.srcObject = camStream;
+        vid.style.display = 'block';
+        vid.classList.add('active');
+        if(camOff) camOff.style.display = 'none';
+      }
+      camOn=true;
+      btn.classList.add('active');
+      lbl.textContent='כבה מצלמה';
+      const cf=document.getElementById('cam-btn-fixed'); if(cf) cf.classList.add('active');
+      showToast('📹 מצלמה פעילה');
+      const selfP=roomParticipants.find(p=>p.self);
+      if(selfP) selfP.camOn=true;
+    } catch(e){
+      if(settingsState.cam) {
+        showToast('⚠️ המצלמה לא זמינה כרגע');
+      } else {
+        
+      }
+    }
+  } else {
+    if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+    const vid=document.getElementById('video-self');
+    const camOff=document.getElementById('camoff-self');
+    if(vid){ vid.style.display='none'; vid.classList.remove('active'); vid.srcObject=null; }
+    if(camOff) camOff.style.display='flex';
+    camOn=false;
+    btn.classList.remove('active');
+    lbl.textContent='מצלמה';
+    showToast('🚫 מצלמה כבויה');
+    const selfP=roomParticipants.find(p=>p.self);
+    if(selfP) selfP.camOn=false;
+  }
+}
+
+// ══════════════════════════════════════════
+// FLIP CAMERA (mobile)
+// ══════════════════════════════════════════
+let currentFacingMode = 'user';
+async function flipCamera() {
+  if(!camOn) { showToast('⚠️ הפעל מצלמה קודם'); return; }
+  currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+  if(camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode: currentFacingMode, width:{ideal:640}, height:{ideal:480} },
+      audio:false
+    });
+    const vid = document.getElementById('video-self');
+    if(vid) { vid.srcObject = camStream; }
+    showToast(currentFacingMode==='user' ? '🤳 מצלמה קדמית' : '📷 מצלמה אחורית');
+  } catch(e) {
+    showToast('⚠️ לא ניתן להפוך מצלמה');
+  }
+}
+
+// ══════════════════════════════════════════
+// SCREEN SHARE
+// ══════════════════════════════════════════
+async function toggleScreen(e){
+  try{ if(e && e.stopPropagation) e.stopPropagation(); }catch(err){}
+  // Check screen share permission
+  if(screenShareLocked && !isHost) {
+    showToast('🖥️ שיתוף מסך חסום על ידי המנהל');
+    return;
+  }
+  if(isMobile || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    showToast('⚠️ שיתוף מסך זמין רק במחשב');
+    return;
+  }
+  const btn=document.getElementById('screen-btn');
+  if(!screenOn){
+    try {
+      screenStream = await navigator.mediaDevices.getDisplayMedia({
+        video:{width:1920,height:1080,frameRate:30},
+        audio:false
+      });
+      // Show screen in self video tile
+      const vid = document.getElementById('video-self');
+      const camOff = document.getElementById('camoff-self');
+      if(vid){
+        vid.srcObject = screenStream;
+        vid.style.display = 'block';
+        vid.classList.add('active');
+        if(camOff) camOff.style.display = 'none';
+      }
+      screenOn=true; btn.classList.add('active');
+      showToast('🖥️ שיתוף מסך פעיל');
+      screenStream.getVideoTracks()[0].onended=()=>{
+        screenOn=false;
+        btn.classList.remove('active');
+        // restore cam or photo
+        if(camStream){
+          if(vid){ vid.srcObject=camStream; }
+        } else {
+          if(vid){ vid.style.display='none'; vid.classList.remove('active'); vid.srcObject=null; }
+          if(camOff) camOff.style.display='flex';
+        }
+        screenStream=null;
+        showToast('🖥️ שיתוף מסך הופסק');
+      };
+    } catch(e){
+      if(e.name === 'NotAllowedError') {
+        showToast('❌ שיתוף מסך בוטל');
+      } else if(e.name === 'NotSupportedError') {
+        showToast('⚠️ שיתוף מסך לא נתמך — פתח ב-Chrome');
+      } else {
+        showToast('❌ ' + (e.message || 'שיתוף מסך נכשל'));
+      }
+    }
+  } else {
+    if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
+    screenOn=false; btn.classList.remove('active');
+    // restore cam or photo
+    const vid = document.getElementById('video-self');
+    const camOff = document.getElementById('camoff-self');
+    if(camStream && vid){
+      vid.srcObject=camStream; vid.style.display='block'; vid.classList.add('active');
+      if(camOff) camOff.style.display='none';
+    } else {
+      if(vid){vid.style.display='none';vid.classList.remove('active');vid.srcObject=null;}
+      if(camOff) camOff.style.display='flex';
+    }
+    showToast('🖥️ שיתוף מסך הופסק');
+  }
+}
+
+// ══════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-panel').classList.toggle('hidden',!chatOpen);
+  document.getElementById('chat-btn').classList.toggle('active',chatOpen);
+}
+function handleChatKey(e){if(e.key==='Enter')sendMessage();}
+function sendMessage(){
+  if(chatLocked){ showToast('🔒 הצ\'אט נעול על ידי המנהל'); return; }
+  const inp=document.getElementById('chat-input');
+  const txt=inp.value.trim(); if(!txt)return;
+  appendChat(currentUser.name, txt, true);
+  inp.value='';
+  // NO fake replies
+}
+function appendChat(name, txt, self){
+  const c=document.getElementById('chat-messages');
+  const m=document.createElement('div');
+  m.className='msg'+(self?' self':'');
+  m.innerHTML=`<div class="msg-who" style="${self?'color:var(--blue)':'color:var(--cyan)'}">${name}</div><div class="msg-bubble">${txt}</div>`;
+  c.appendChild(m); c.scrollTop=c.scrollHeight;
+}
+function addChatSystem(txt){
+  const c=document.getElementById('chat-messages');
+  const m=document.createElement('div');
+  m.style.cssText='text-align:center;color:var(--muted);font-size:10px;padding:3px';
+  m.textContent=txt;
+  c.appendChild(m); c.scrollTop=c.scrollHeight;
+}
+
+// ══════════════════════════════════════════
+// ADMIN ACTIONS
+// ══════════════════════════════════════════
+
+
+function toggleAdminPanel(){
+  adminPanelOpen=!adminPanelOpen;
+  document.getElementById('admin-panel').style.display=adminPanelOpen?'block':'none';
+  document.getElementById('admin-panel-btn').classList.toggle('active',adminPanelOpen);
+}
+
+let allMuted = false;
+function muteAll(){
+  allMuted = !allMuted;
+  const btn = document.getElementById('mute-all-btn');
+  roomParticipants.forEach(p=>{
+    if(!p.self){
+      p.muted = allMuted;
+      const badge=document.getElementById('muted-badge-'+p.id);
+      if(badge) badge.style.display = allMuted ? '' : 'none';
+      const tile=document.getElementById('tile-'+p.id);
+      if(tile) tile.classList.toggle('muted-tile', allMuted);
+    }
+  });
+  if(btn) btn.textContent = allMuted ? '🔊 בטל השתקה לכולם' : '🔇 השתק את כולם';
+  renderParticipantsSidebar();
+  showToast(allMuted ? '🔇 כולם הושתקו' : '🔊 ביטול השתקה לכולם');
+  try { addChatSystem(allMuted ? 'המנהל השתיק את כולם' : 'המנהל ביטל השתקה לכולם'); } catch(e){}
+}
+
+function toggleChatLock(){
+  chatLocked=!chatLocked;
+  document.getElementById('chat-lock-btn').textContent=chatLocked?'🔓 בטל נעילת צ\'אט':'🔒 נעל צ\'אט';
+  document.getElementById('chat-locked-badge').style.display=chatLocked?'flex':'none';
+  document.getElementById('chat-input-area').style.display=chatLocked?'none':'flex';
+  showToast(chatLocked?'🔒 הצ\'אט ננעל':'🔓 הצ\'אט נפתח');
+  addChatSystem(chatLocked?'המנהל נעל את הצ\'אט':'המנהל פתח את הצ\'אט');
+}
+
+// KICK MODAL — choose who to remove
+function openKickModal(){
+  const list = document.getElementById('kick-list');
+  list.innerHTML='';
+  const others = roomParticipants.filter(p=>!p.self);
+  if(!others.length){
+    list.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">אין משתתפים נוספים</div>';
+  } else {
+    others.forEach(p=>{
+      const row=document.createElement('div');
+      row.className='kick-user-row';
+      let avHtml;
+      if(p.emoji) avHtml=`<div class="kick-avatar" style="background:${p.color}">${p.emoji}</div>`;
+      else {
+        const ini=p.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+        avHtml=`<div class="kick-avatar" style="background:${p.color}">${ini}</div>`;
+      }
+      row.innerHTML=`
+        <div class="kick-user-info">
+          ${avHtml}
+          <div><div style="font-weight:700;font-size:13px">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.email}</div></div>
+        </div>
+        <button type="button" class="kick-btn" onclick="kickUser('${p.id}')">הוצא</button>`;
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('admin-panel').style.display='none';
+  adminPanelOpen=false;
+  document.getElementById('kick-modal').classList.add('open');
+}
+
+function kickUser(id){
+  const p = roomParticipants.find(x=>x.id===id);
+  if(!p) return;
+  roomParticipants = roomParticipants.filter(x=>x.id!==id);
+  renderGrid();
+  try { addChatSystem(p.name + ' הוצא/ה מהפגישה'); } catch(e){}
+  showToast(`👤 ${p.name} הוצא/ה`);
+  // Refresh kick list
+  openKickModal();
+  if(roomParticipants.filter(p=>!p.self).length===0) closeModal('kick-modal');
+}
+
+// SPEAK MODAL — allow specific users to speak (when all muted)
+function openSpeakModal(){
+  renderSpeakList();
+  document.getElementById('admin-panel').style.display='none';
+  adminPanelOpen=false;
+  document.getElementById('speak-modal').classList.add('open');
+}
+function renderSpeakList(){
+  const list=document.getElementById('speak-list');
+  list.innerHTML='';
+  const others=roomParticipants.filter(p=>!p.self);
+  if(!others.length){
+    list.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">אין משתתפים נוספים</div>';
+    return;
+  }
+  others.forEach(p=>{
+    const allowed = allowedToSpeak[p.id]!==false;
+    const row=document.createElement('div');
+    row.className='speak-user-row';
+    let avHtml;
+    if(p.emoji) avHtml=`<div class="kick-avatar" style="background:${p.color};width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px">${p.emoji}</div>`;
+    else {
+      const ini=p.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+      avHtml=`<div style="background:${p.color};width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff">${ini}</div>`;
+    }
+    row.innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;flex:1">
+        ${avHtml}
+        <div style="font-weight:700;font-size:13px">${p.name}</div>
+      </div>
+      <button type="button" class="speak-toggle ${allowed?'allowed':'blocked'}" id="speak-btn-${p.id}" onclick="toggleSpeakPermission('${p.id}')">
+        ${allowed?'✅ מורשה':'🚫 חסום'}
+      </button>`;
+    list.appendChild(row);
+  });
+}
+function toggleSpeakPermission(id){
+  allowedToSpeak[id] = !allowedToSpeak[id];
+  const p = roomParticipants.find(x=>x.id===id);
+  if(p){
+    if(!allowedToSpeak[id]){
+      p.muted=true;
+      const badge=document.getElementById('muted-badge-'+id);
+      if(badge) badge.style.display='';
+      const tile=document.getElementById('tile-'+id);
+      if(tile) tile.classList.add('muted-tile');
+      showToast(`🚫 ${p.name} חסום מלדבר`);
+      addChatSystem(`${p.name} אינו/ה יכול/ה לדבר`);
+    } else {
+      p.muted=false;
+      const badge=document.getElementById('muted-badge-'+id);
+      if(badge) badge.style.display='none';
+      const tile=document.getElementById('tile-'+id);
+      if(tile) tile.classList.remove('muted-tile');
+      showToast(`✅ ${p.name} מורשה לדבר`);
+      addChatSystem(`${p.name} קיבל/ה הרשאה לדבר`);
+    }
+    renderParticipantsSidebar();
+  }
+  renderSpeakList();
+}
+
+// ══════════════════════════════════════════
+// TIMER & END
+// ══════════════════════════════════════════
+function startTimer(){
+  clearInterval(timerInt); timerSec=0;
+  timerInt=setInterval(()=>{
+    timerSec++;
+    const m=String(Math.floor(timerSec/60)).padStart(2,'0');
+    const s=String(timerSec%60).padStart(2,'0');
+    document.getElementById('room-timer').textContent=m+':'+s;
+  },1000);
+}
+
+function openPromoteModal() {
+  const list = document.getElementById('promote-list');
+  list.innerHTML = '';
+  const others = roomParticipants.filter(p => !p.self);
+  if(!others.length) {
+    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px">⏳ ממתין למשתתפים שיצטרפו לפגישה</div>';
+  } else {
+    others.forEach(p => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:Heebo,sans-serif;font-size:14px;color:var(--text);touch-action:manipulation;width:100%';
+      btn.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:'+(p.color||'#4f8aff')+';display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0">'+(p.name||'?')[0]+'</div><div style="flex:1;text-align:right">'+p.name+'</div><div style="color:var(--blue);font-size:12px">הוסף ⭐</div>';
+      btn.onclick = function() {
+        p.isAdmin = true;
+        showToast('⭐ ' + p.name + ' עכשיו מנהל!');
+        try { addChatSystem('⭐ ' + p.name + ' מונה כמנהל'); } catch(e){}
+        closeModal('promote-modal');
+      };
+      list.appendChild(btn);
+    });
+  }
+  document.getElementById('promote-modal').classList.add('open');
+}
+
+function openScreenShareModal() {
+  const list = document.getElementById('screen-share-list');
+  if(!list) return;
+  list.innerHTML = '';
+  const others = roomParticipants.filter(p => !p.self);
+  if(!others.length) {
+    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין משתתפים נוספים</div>';
+  } else {
+    others.forEach(p => {
+      const allowed = screenShareAllowed[p.id] !== false;
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.cssText = 'padding:6px 14px;border-radius:8px;border:none;font-family:Heebo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;background:'+(allowed?'rgba(0,229,160,.2)':'rgba(255,77,106,.2)')+';color:'+(allowed?'#00e5a0':'#ff4d6a');
+      btn.textContent = allowed ? '✅ מורשה' : '❌ חסום';
+      btn.onclick = function() {
+        screenShareAllowed[p.id] = screenShareAllowed[p.id] === false ? true : false;
+        const a = screenShareAllowed[p.id] !== false;
+        btn.textContent = a ? '✅ מורשה' : '❌ חסום';
+        btn.style.background = a ? 'rgba(0,229,160,.2)' : 'rgba(255,77,106,.2)';
+        btn.style.color = a ? '#00e5a0' : '#ff4d6a';
+        showToast(p.name + (a ? ' מורשה לשתף' : ' חסום משיתוף'));
+      };
+      const nameDiv = document.createElement('div');
+      nameDiv.style.cssText = 'display:flex;align-items:center;gap:10px';
+      nameDiv.innerHTML = '<div style="width:32px;height:32px;border-radius:50%;background:'+(p.color||'#4f8aff')+';display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:13px">'+(p.name||'?')[0]+'</div><div style="font-size:14px;font-weight:700">'+p.name+'</div>';
+      row.appendChild(nameDiv);
+      row.appendChild(btn);
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('screen-share-modal').classList.add('open');
+}
+
+function endCall(){
+  try { clearInterval(timerInt); } catch(e){}
+  try { if(socket){ socket.disconnect(); socket=null; } } catch(e){}
+  try { if(typeof stopSpeakingDetection==='function') stopSpeakingDetection(); } catch(e){}
+  try { if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;} } catch(e){}
+  try { if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} } catch(e){}
+  try { if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;} } catch(e){}
+  micOn=true; camOn=false; chatLocked=false; isHost=false;
+  chatOpen=false; participantsOpen=false; adminPanelOpen=false;
+  myHandRaised=false; handQueue=[];
+  try { document.getElementById('admin-panel').style.display='none'; } catch(e){}
+  try { document.getElementById('participants-sidebar').classList.remove('show'); } catch(e){}
+  try { document.getElementById('chat-panel').classList.add('hidden'); } catch(e){}
+  try { document.getElementById('mic-label').textContent='השתק'; } catch(e){}
+  try { document.getElementById('cam-label').textContent='מצלמה'; } catch(e){}
+  try { document.getElementById('mic-btn').classList.remove('muted','active'); } catch(e){}
+  try { document.getElementById('cam-btn').classList.remove('active'); } catch(e){}
+  showPage('lobby-page');
+  showToast('הפגישה הסתיימה 👋');
+}
+
+function copyRoomId(){
+  const code = currentRoomCode || '';
+  navigator.clipboard?.writeText(code).catch(()=>{});
+  showToast('✅ הועתק קוד: ' + code);
+}
+</script>
+
+<!-- SETTINGS MODAL -->
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-box" style="max-width:340px;width:92vw;padding:0;overflow:hidden;border-radius:18px">
+
+    <!-- Pull handle -->
+    <div style="display:flex;justify-content:center;padding:10px 0 0;background:var(--s2)">
+      <div style="width:36px;height:4px;border-radius:2px;background:var(--border)"></div>
+    </div>
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px 12px;background:var(--s2);border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">⚙️</span>
+        <span style="font-size:15px;font-weight:800">הגדרות</span>
+      </div>
+      <button type="button" onclick="closeModal('settings-modal')" style="background:var(--s3);border:none;color:var(--text);width:32px;height:32px;border-radius:9px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;font-family:sans-serif">✕</button>
+    </div>
+
+    <!-- Toggle rows -->
+    <div style="padding:8px 0">
+
+      <!-- Mic -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;min-height:60px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">🎙️</span>
+          <div>
+            <div style="font-size:14px;font-weight:700">מיקרופון</div>
+            <div id="mic-perm-status" style="font-size:11px;color:var(--muted);margin-top:2px"></div>
+          </div>
+        </div>
+        <button type="button" id="toggle-mic" onclick="settingsToggle('mic')" style="width:56px;height:30px;border-radius:15px;border:none;background:var(--s3);cursor:pointer;position:relative;transition:background .25s;touch-action:manipulation;flex-shrink:0;padding:0;min-width:56px">
+          <span id="toggle-mic-dot" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:#666;transition:all .25s;display:block"></span>
+        </button>
+      </div>
+      <div style="height:1px;background:var(--border);margin:0 20px"></div>
+
+      <!-- Camera -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;min-height:60px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">📹</span>
+          <div>
+            <div style="font-size:14px;font-weight:700">מצלמה</div>
+            <div id="cam-perm-status" style="font-size:11px;color:var(--muted);margin-top:2px"></div>
+          </div>
+        </div>
+        <button type="button" id="toggle-cam" onclick="settingsToggle('cam')" style="width:56px;height:30px;border-radius:15px;border:none;background:var(--s3);cursor:pointer;position:relative;transition:background .25s;touch-action:manipulation;flex-shrink:0;padding:0;min-width:56px">
+          <span id="toggle-cam-dot" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:#666;transition:all .25s;display:block"></span>
+        </button>
+      </div>
+      <div style="height:1px;background:var(--border);margin:0 20px"></div>
+
+      <!-- Speaker -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;min-height:60px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">🔊</span>
+          <div>
+            <div style="font-size:14px;font-weight:700">רמקול</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">לחץ לבדיקת צליל</div>
+          </div>
+        </div>
+        <button type="button" id="toggle-speaker" onclick="settingsToggle('speaker')" style="width:56px;height:30px;border-radius:15px;border:none;background:var(--s3);cursor:pointer;position:relative;transition:background .25s;touch-action:manipulation;flex-shrink:0;padding:0;min-width:56px">
+          <span id="toggle-speaker-dot" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:#666;transition:all .25s;display:block"></span>
+        </button>
+      </div>
+
+      <!-- Screen share desktop only -->
+      <div id="screen-perm-row" style="border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;min-height:60px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:22px">🖥️</span>
+            <div>
+              <div style="font-size:14px;font-weight:700">שיתוף מסך</div>
+              <div id="screen-perm-status" style="font-size:11px;color:var(--muted);margin-top:2px">לחץ להפעיל</div>
+            </div>
+          </div>
+          <button type="button" id="toggle-screen" onclick="settingsToggle('screen')" style="width:56px;height:30px;border-radius:15px;border:none;background:var(--s3);cursor:pointer;position:relative;transition:background .25s;touch-action:manipulation;flex-shrink:0;padding:0;min-width:56px">
+            <span id="toggle-screen-dot" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:#666;transition:all .25s;display:block"></span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+
+
+    <!-- Hidden selects for device picking -->
+    <select id="mic-device-select" onchange="changeMicDevice(this.value)" style="display:none"><option value="">ברירת מחדל</option></select>
+    <select id="cam-device-select" onchange="changeCamDevice(this.value)" style="display:none"><option value="">ברירת מחדל</option></select>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// SETTINGS & PERMISSIONS
+// ══════════════════════════════════════════
+// ══ DEFINITIVE iOS SAFARI TAP FIX ══
+// Add touchstart to every button so Safari recognizes them as tappable
+(function(){
+  function fixButtons() {
+    document.querySelectorAll('button').forEach(function(btn) {
+      if(btn._fixed) return;
+      btn._fixed = true;
+      btn.addEventListener('touchstart', function(){}, {passive:true});
+    });
+  }
+  document.addEventListener('DOMContentLoaded', fixButtons);
+  setInterval(fixButtons, 800);
+})();
+
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// ── Detect WebView (WhatsApp / Facebook / Instagram browser) ──
+const isWebView = (function(){
+  const ua = navigator.userAgent;
+  return /FBAN|FBAV|Instagram|WhatsApp|wv|FB_IAB/.test(ua) ||
+         (isMobile && !/Chrome|Safari|Firefox|SamsungBrowser|OPR/.test(ua)) ||
+         (isMobile && /wv/.test(ua));
+})();
+
+if(isWebView) {
+  setTimeout(function(){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;padding:10px 16px;text-align:center;font-family:Heebo,sans-serif;font-size:13px;font-weight:700;direction:rtl;display:flex;align-items:center;justify-content:space-between;gap:10px';
+    const pageUrl = window.location.href;
+    const chromeUrl = pageUrl.replace(/^content:\/\//, 'googlechrome://');
+    banner.innerHTML = `
+      <span style="flex:1;text-align:right;font-size:12px">⚠️ פתח ב-Chrome לגישה למצלמה</span>
+      <button type="button" onclick="window.open('${chromeUrl}','_blank') || window.open('${pageUrl}','_blank')"
+        style="background:#000;color:#f59e0b;border:none;border-radius:8px;padding:8px 14px;font-family:Heebo,sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;touch-action:manipulation">
+        פתח ב-Chrome
+      </button>`;
+    document.body.appendChild(banner);
+  }, 500);
+}
+
+// Toggle state: tracks which permissions are on
+const settingsState = { mic: false, cam: false, speaker: false, screen: false };
+
+function setToggle(name, on) {
+  settingsState[name] = on;
+  const btn = document.getElementById('toggle-' + name);
+  const dot = document.getElementById('toggle-' + name + '-dot');
+  if(!btn || !dot) return;
+  if(on) {
+    btn.style.background = 'var(--green)';
+    dot.style.right = '4px';
+    dot.style.left = 'auto';
+    dot.style.background = '#fff';
+    // RTL: move dot to left side when ON
+    dot.style.right = 'auto';
+    dot.style.left = '4px';
+  } else {
+    btn.style.background = 'var(--s3)';
+    dot.style.left = 'auto';
+    dot.style.right = '4px';
+    dot.style.background = '#666';
+  }
+}
+
+async function grantPermissions() {
+  // Check if mediaDevices is available at all
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    // On iOS file:// or WebView - show clear message
+    document.getElementById('perm-banner-text').textContent = '❌ פתח את הקישור ב-Safari — לא בוואטסאפ';
+    document.getElementById('perm-banner-text').style.color = '#ff4d6a';
+    return;
+  }
+
+  // Show loading state
+  const btn = document.getElementById('perm-grant-btn');
+  btn.textContent = '⏳ מחכה לאישור...';
+  btn.disabled = true;
+
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({audio:true, video:true});
+    s.getTracks().forEach(t=>t.stop());
+    document.getElementById('perm-banner').style.display = 'none';
+    lsSet('zoomPermissionsSet', true);
+    showToast('✅ מצלמה ומיקרופון פועלים!');
+  } catch(e) {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
+      s.getTracks().forEach(t=>t.stop());
+      document.getElementById('perm-banner').style.display = 'none';
+      lsSet('zoomPermissionsSet', true);
+      showToast('✅ מיקרופון פועל!');
+    } catch(e2) {
+      btn.disabled = false;
+      btn.textContent = '✅ אפשר גישה';
+      if(e2.name === 'NotAllowedError') {
+        document.getElementById('perm-banner-text').textContent = '❌ נחסם — לחץ שוב ואשר';
+        document.getElementById('perm-banner-text').style.color = '#ff4d6a';
+      } else {
+        document.getElementById('perm-banner-text').textContent = '❌ ' + e2.name + ' — פתח ב-Safari';
+        document.getElementById('perm-banner-text').style.color = '#ff4d6a';
+      }
+    }
+  }
+}
+
+async function settingsToggle(name) {
+  if(name === 'mic') {
+    if(settingsState.mic) {
+      // Turn off
+      setToggle('mic', false);
+      setPermStatus('mic-perm-status', 'off');
+    } else {
+      setPermStatus('mic-perm-status', 'asking');
+      try {
+        if(!localStream) {
+          localStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});
+          localStream.getAudioTracks().forEach(t=>t.enabled=false);
+        }
+        setToggle('mic', true);
+        setPermStatus('mic-perm-status', 'granted');
+        lsSet('zoomPermissionsSet', true);
+        startSpeakingDetection(localStream);
+      } catch(e) {
+        setToggle('mic', false);
+        if(isWebView) {
+          setPermStatus('mic-perm-status', 'webview');
+        } else {
+          setPermStatus('mic-perm-status', e.name==='NotAllowedError' ? 'denied' : 'error');
+        }
+      }
+    }
+  } else if(name === 'cam') {
+    if(settingsState.cam) {
+      setToggle('cam', false);
+      setPermStatus('cam-perm-status', 'off');
+    } else {
+      setPermStatus('cam-perm-status', 'asking');
+      try {
+        const s = await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+        s.getTracks().forEach(t=>t.stop());
+        setToggle('cam', true);
+        setPermStatus('cam-perm-status', 'granted');
+        lsSet('zoomPermissionsSet', true);
+      } catch(e) {
+        setToggle('cam', false);
+        if(isWebView) {
+          setPermStatus('cam-perm-status', 'webview');
+        } else {
+          setPermStatus('cam-perm-status', e.name==='NotAllowedError' ? 'denied' : 'error');
+        }
+      }
+    }
+  } else if(name === 'speaker') {
+    if(settingsState.speaker) {
+      setToggle('speaker', false);
+    } else {
+      try {
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 440;
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.7);
+        osc.start(); osc.stop(ctx.currentTime+0.7);
+        setToggle('speaker', true);
+        showToast('🔊 צליל בדיקה');
+      } catch(e) { showToast('⚠️ לא ניתן לנגן'); }
+    }
+  } else if(name === 'screen') {
+    if(settingsState.screen) {
+      setToggle('screen', false);
+      document.getElementById('screen-perm-status').textContent = 'לחץ להפעיל';
+      document.getElementById('screen-perm-status').style.color = 'var(--muted)';
+    } else {
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        document.getElementById('screen-perm-status').textContent = '❌ לא נתמך';
+        document.getElementById('screen-perm-status').style.color = 'var(--red)';
+        return;
+      }
+      try {
+        const s = await navigator.mediaDevices.getDisplayMedia({video:true});
+        s.getTracks().forEach(t=>t.stop());
+        setToggle('screen', true);
+        document.getElementById('screen-perm-status').textContent = '✅ זמין';
+        document.getElementById('screen-perm-status').style.color = 'var(--green)';
+      } catch(e) {
+        document.getElementById('screen-perm-status').textContent = 'בוטל';
+      }
+    }
+  }
+}
+
+function openSettings() {
+  document.getElementById('settings-modal').classList.add('open');
+  if(isMobile) document.getElementById('screen-perm-row').style.display='none';
+  // Also hide screen share button in controls on mobile
+  if(isMobile) { const sb = document.getElementById('screen-btn-wrap'); if(sb) sb.style.display='none'; }
+  syncToggleStates();
+}
+
+function setPermStatus(elId, state) {
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const msgs = {
+    'off':     {text:'',             color:'var(--muted)'},
+    'asking':  {text:'👆 לחץ אפשר בחלון שנפתח', color:'var(--blue)'},
+    'granted': {text:'✅ פועל',        color:'var(--green)'},
+    'denied':  {text:'❌ חסום',        color:'var(--red)'},
+    'webview': {text:'❌ פתח ב-Chrome', color:'var(--red)'},
+    'error':   {text:'⚠️ לא זמין',     color:'var(--yellow)'},
+  };
+  const m = msgs[state] || msgs['off'];
+  el.textContent = m.text;
+  el.style.color  = m.color;
+}
+
+async function syncToggleStates() {
+  try {
+    const mic = await navigator.permissions.query({name:'microphone'});
+    if(mic.state === 'granted') { setToggle('mic', true); document.getElementById('mic-perm-status').textContent='✅ מאושר'; document.getElementById('mic-perm-status').style.color='var(--green)'; }
+    else if(mic.state === 'denied') { document.getElementById('mic-perm-status').textContent='❌ חסום'; document.getElementById('mic-perm-status').style.color='var(--red)'; }
+  } catch(e){}
+  try {
+    const cam = await navigator.permissions.query({name:'camera'});
+    if(cam.state === 'granted') { setToggle('cam', true); document.getElementById('cam-perm-status').textContent='✅ מאושר'; document.getElementById('cam-perm-status').style.color='var(--green)'; }
+    else if(cam.state === 'denied') { document.getElementById('cam-perm-status').textContent='❌ חסום'; document.getElementById('cam-perm-status').style.color='var(--red)'; }
+  } catch(e){}
+}
+
+async function checkPermissions() {
+  // Check mic
+  try {
+    const mic = await navigator.permissions.query({name:'microphone'});
+    updatePermStatus('mic-perm-status', mic.state);
+    mic.onchange = () => updatePermStatus('mic-perm-status', mic.state);
+  } catch(e) { document.getElementById('mic-perm-status').textContent = 'בדוק ידנית'; }
+
+  // Check camera
+  try {
+    const cam = await navigator.permissions.query({name:'camera'});
+    updatePermStatus('cam-perm-status', cam.state);
+    cam.onchange = () => updatePermStatus('cam-perm-status', cam.state);
+  } catch(e) { document.getElementById('cam-perm-status').textContent = 'בדוק ידנית'; }
+}
+
+function updatePermStatus(elId, state) {
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const map = { granted:'✅ מאושר', denied:'❌ חסום — שנה בהגדרות', prompt:'⏳ לא הוחלט עדיין' };
+  el.textContent = map[state] || state;
+  el.style.color = state==='granted' ? 'var(--green)' : state==='denied' ? 'var(--red)' : 'var(--muted)';
+}
+
+function requestMicPermission() { openSettings(); settingsToggle('mic'); }
+function requestCamPermission() { openSettings(); settingsToggle('cam'); }
+
+async function requestScreenPermission() {
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    document.getElementById('screen-perm-status').textContent = '❌ לא נתמך במכשיר זה';
+    document.getElementById('screen-perm-status').style.color = 'var(--red)';
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
+    stream.getTracks().forEach(t=>t.stop());
+    document.getElementById('screen-perm-status').textContent = '✅ זמין';
+    document.getElementById('screen-perm-status').style.color = 'var(--green)';
+    showToast('✅ שיתוף מסך זמין!');
+  } catch(e) {
+    document.getElementById('screen-perm-status').textContent = '⚠️ בוטל';
+    showToast('שיתוף מסך בוטל');
+  }
+}
+
+function testSpeaker() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 440;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    osc.start(); osc.stop(ctx.currentTime + 0.8);
+    document.getElementById('speaker-perm-status').textContent = '✅ עובד';
+    document.getElementById('speaker-perm-status').style.color = 'var(--green)';
+    showToast('🔊 צליל בדיקה');
+  } catch(e) {
+    showToast('⚠️ לא ניתן לנגן צליל');
+  }
+}
+
+// iOS SAFARI FIX - empty touchstart makes all elements tappable
+document.addEventListener('touchstart', function(){}, {passive:true});
+
+
+
+
+
+
+</script>
+
+<!-- CHANGE CREDENTIALS MODAL -->
+<div class="modal-overlay" id="change-cred-modal">
+  <div class="modal-box" style="max-width:320px;width:92vw">
+    <button type="button" class="modal-close" onclick="closeModal('change-cred-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">🔑 שנה פרטים</div>
+
+    <!-- שלב 1: אימות סיסמה -->
+    <div id="cred-step1">
+      <div class="modal-sub" style="margin-bottom:14px">הכנס סיסמה נוכחית לאימות</div>
+      <input class="field" type="password" id="current-pass-field" placeholder="סיסמה נוכחית" style="margin-bottom:12px" />
+      <div id="change-cred-error" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px"></div>
+      <button type="button" class="cta-btn" onclick="verifyCurrentPass()">המשך ←</button>
+    </div>
+
+    <!-- שלב 2: שינוי פרטים -->
+    <div id="cred-step2" style="display:none">
+      <div class="modal-label">אימייל חדש</div>
+      <input class="field" id="new-email-field" placeholder="השאר ריק לשמור" style="margin-bottom:12px" />
+      <div class="modal-label">סיסמה חדשה</div>
+      <input class="field" type="password" id="new-pass-field" placeholder="השאר ריק לשמור" style="margin-bottom:16px" />
+      <div id="change-cred-error2" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px"></div>
+      <button type="button" class="cta-btn" onclick="saveCredentials()">שמור שינויים</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREDITS MODAL -->
+<div class="modal-overlay" id="credits-modal">
+  <div class="modal-box" style="max-width:320px;width:92vw;text-align:center">
+    <button type="button" class="modal-close" onclick="closeModal('credits-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div style="font-size:48px;margin-bottom:12px">🎥</div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px">זום ישראל</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">שיחות וידאו · קלות · מהירות · חינם</div>
+    <div style="background:var(--s2);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">יוצר</div>
+      <div style="font-size:18px;font-weight:900;color:var(--text)">אורי בוקטוס</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted)">גרסה 1.0 · 2026</div>
+    <button type="button" class="cta-btn" style="margin-top:16px" onclick="closeModal('credits-modal')">סגור</button>
+  </div>
+</div>
+
+<!-- SCREEN SHARE MODAL -->
+<div class="modal-overlay" id="screen-share-modal">
+  <div class="modal-box" style="max-width:340px;width:92vw">
+    <button type="button" class="modal-close" onclick="closeModal('screen-share-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">🖥️ הרשאות שיתוף מסך</div>
+    <div class="modal-sub" style="margin-bottom:16px">בחר מי יכול לשתף מסך</div>
+    <div id="screen-share-list" style="max-height:300px;overflow-y:auto"></div>
+    <button type="button" class="cta-btn" style="margin-top:16px" onclick="closeModal('screen-share-modal')">סגור</button>
+  </div>
+</div>
+
+<!-- PROMOTE MODAL -->
+<div class="modal-overlay" id="promote-modal">
+  <div class="modal-box" style="max-width:340px;width:92vw">
+    <button type="button" class="modal-close" onclick="closeModal('promote-modal')" style="touch-action:manipulation;cursor:pointer;background:none;border:none;font-size:inherit;color:inherit;font-family:inherit">✕</button>
+    <div class="modal-title">⭐ הוסף מנהל</div>
+    <div class="modal-sub" style="margin-bottom:16px">בחר משתתף שיהפוך למנהל</div>
+    <div id="promote-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto"></div>
+    <button type="button" class="cta-btn" style="margin-top:16px" onclick="closeModal('promote-modal')">סגור</button>
+  </div>
+</div>
+
+<!-- PROFILE POPUP -->
+<div id="profile-popup" style="display:none;position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:200;width:300px;background:var(--s1);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.7);overflow:hidden;animation:modalIn .2s cubic-bezier(.16,1,.3,1)">
+  <!-- First time setup banner (shown once) -->
+  <div id="pp-first-time-banner" style="display:none;background:rgba(79,138,255,.15);border-bottom:1px solid rgba(79,138,255,.3);padding:10px 16px;font-size:12px;color:#90b8ff;text-align:center">
+    👋 ברוך הבא! הגדר את ההרשאות שלך לפני שמתחילים
+  </div>
+  <!-- Header with avatar -->
+  <div style="padding:20px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px">
+    <div id="profile-popup-avatar" style="width:52px;height:52px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden"></div>
+    <div style="flex:1;min-width:0">
+      <div id="profile-popup-name" style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+      <div id="profile-popup-email" style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    </div>
+  </div>
+
+  <!-- Permissions status -->
+  <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px">הרשאות</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px">🎤 מיקרופון</span>
+        <span id="pp-mic-status" style="font-size:11px;color:var(--muted)">...</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px">📹 מצלמה</span>
+        <span id="pp-cam-status" style="font-size:11px;color:var(--muted)">...</span>
+      </div>
+      <div id="pp-screen-row" style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px">🖥️ שיתוף מסך</span>
+        <span id="pp-screen-status" style="font-size:11px;color:var(--muted)">...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu items -->
+  <div style="padding:8px">
+    <button type="button" onclick="openSettingsFromProfile()" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;transition:background .15s;background:transparent;border:none;width:100%;color:var(--text);font-family:'Heebo',sans-serif;text-align:right">
+      <span style="font-size:18px">⚙️</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">הגדרות והרשאות</div>
+        <div style="font-size:11px;color:var(--muted)">מצלמה, מיקרופון, שיתוף מסך</div>
+      </div>
+    </div>
+    <button type="button" onclick="openChangePhotoFromProfile()" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;width:100%;background:transparent;border:none;color:var(--text);font-family:'Heebo',sans-serif;text-align:right">
+      <span style="font-size:18px">🖼️</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">שנה תמונת פרופיל</div>
+        <div style="font-size:11px;color:var(--muted)">בחר תמונה חדשה</div>
+      </div>
+    </button>
+    <div style="height:1px;background:var(--border);margin:6px 0"></div>
+    <button type="button" onclick="openChangeCredentials()" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;width:100%;background:transparent;border:none;font-family:'Heebo',sans-serif;text-align:right">
+      <span style="font-size:18px">🔑</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">שנה סיסמה / אימייל</div>
+      </div>
+    </button>
+    <button type="button" onclick="switchUser()" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;width:100%;background:transparent;border:none;font-family:'Heebo',sans-serif;text-align:right">
+      <span style="font-size:18px">🔄</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">החלף משתמש</div>
+        <div style="font-size:11px;color:var(--muted)">יוצא בלי למחוק חשבון</div>
+      </div>
+    </button>
+    <button type="button" onclick="logOut()" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;width:100%;background:transparent;border:none;font-family:'Heebo',sans-serif;text-align:right">
+      <span style="font-size:18px">🚪</span>
+      <div style="font-size:13px;font-weight:700;color:var(--red)">התנתק לחלוטין</div>
+    </button>
+  </div>
+</div>
+<!-- Backdrop to close popup -->
+<button type="button" id="profile-popup-backdrop" onclick="closeProfilePopup()" style="display:none;position:fixed;inset:0;z-index:199;background:transparent;border:none;padding:0;-webkit-appearance:none;cursor:pointer;touch-action:manipulation;pointer-events:none"></button></div>
+
+
+<!-- CHANGE PHOTO MODAL (from profile) -->
+<div class="modal-overlay" id="change-photo-modal">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-title">🖼️ שנה תמונת פרופיל</div>
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <div id="change-photo-preview" style="width:80px;height:80px;border-radius:50%;background:var(--s2);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden"></div>
+    </div>
+    <!-- Upload -->
+    <label style="display:block;padding:10px;background:var(--s2);border:1px dashed var(--border);border-radius:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--blue);margin-bottom:12px">
+      📁 העלה מהמחשב / טלפון
+      <input type="file" id="change-photo-file" accept="image/*" style="display:none" onchange="previewChangePhoto(this)">
+    </label>
+    <!-- Preset grid -->
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">או בחר תמונה:</div>
+    <div id="change-photo-presets" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;max-height:200px;overflow-y:auto"></div>
+    <div style="display:flex;gap:8px">
+      <button type="button" onclick="saveChangedPhoto()" style="flex:1;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Heebo',sans-serif;font-size:14px;font-weight:800;cursor:pointer">שמור</button>
+      <button type="button" onclick="closeModal('change-photo-modal')" style="flex:1;padding:11px;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;cursor:pointer">ביטול</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════
+// PROFILE POPUP
+// ══════════════════════════════════════════
+let _pendingNewPhoto = null;
+
+function toggleProfilePopup() {
+  const popup = document.getElementById('profile-popup');
+  if(popup.style.display === 'none' || popup.style.display === '') {
+    openProfilePopup();
+  } else {
+    closeProfilePopup();
+  }
+}
+
+function openProfilePopup() {
+  const popup = document.getElementById('profile-popup');
+  const backdrop = document.getElementById('profile-popup-backdrop');
+  popup.style.display = 'block';
+  backdrop.style.display = 'block';
+  // Show first-time banner if permissions not yet set
+  const banner = document.getElementById('pp-first-time-banner');
+  if(banner) {
+    const alreadySet = lsGet('zoomPermissionsSet');
+    banner.style.display = alreadySet ? 'none' : 'block';
+  }
+
+  // Fill user info
+  const av = document.getElementById('profile-popup-avatar');
+  if(currentUser.photo) {
+    av.innerHTML = `<img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover">`;
+    av.style.background = 'transparent';
+  } else {
+    av.innerHTML = '';
+    av.textContent = (currentUser.name||'?')[0].toUpperCase();
+    av.style.background = currentUser.color || '#4f8aff';
+  }
+  document.getElementById('profile-popup-name').textContent = currentUser.name || '';
+  document.getElementById('profile-popup-email').textContent = currentUser.email || '';
+
+  // Hide screen share row on mobile
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    const sr = document.getElementById('pp-screen-row');
+    if(sr) sr.style.display = 'none';
+  }
+
+  // Check permissions
+  checkPermissionsInPopup();
+}
+
+function closeProfilePopup() {
+  document.getElementById('profile-popup').style.display = 'none';
+  document.getElementById('profile-popup-backdrop').style.display = 'none';
+}
+
+async function checkPermissionsInPopup() {
+  const stateMap = { granted:'✅ מאושר', denied:'❌ חסום', prompt:'⚠️ לא הוחלט' };
+  const colorMap = { granted:'var(--green)', denied:'var(--red)', prompt:'var(--yellow)' };
+
+  const setStatus = (id, state) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = stateMap[state] || state;
+    el.style.color = colorMap[state] || 'var(--muted)';
+    // Also update settings modal if open
+    const settingsEl = document.getElementById(id.replace('pp-','').replace('-status','') + '-perm-status');
+  };
+
+  try {
+    const mic = await navigator.permissions.query({name:'microphone'});
+    setStatus('pp-mic-status', mic.state);
+    mic.onchange = () => setStatus('pp-mic-status', mic.state);
+  } catch(e) { document.getElementById('pp-mic-status').textContent = 'בדוק ידנית'; }
+
+  try {
+    const cam = await navigator.permissions.query({name:'camera'});
+    setStatus('pp-cam-status', cam.state);
+    cam.onchange = () => setStatus('pp-cam-status', cam.state);
+  } catch(e) { document.getElementById('pp-cam-status').textContent = 'בדוק ידנית'; }
+
+  const sup = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
+  const screenEl = document.getElementById('pp-screen-status');
+  if(screenEl) { screenEl.textContent = sup ? '✅ זמין' : '❌ לא נתמך'; screenEl.style.color = sup ? 'var(--green)' : 'var(--red)'; }
+}
+
+function openSettingsFromProfile() {
+  closeProfilePopup();
+  openSettings();
+}
+
+function openChangePhotoFromProfile() {
+  closeProfilePopup();
+  _pendingNewPhoto = currentUser.photo || null;
+
+  // Show current photo in preview
+  const prev = document.getElementById('change-photo-preview');
+  if(currentUser.photo) {
+    prev.innerHTML = `<img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover">`;
+  } else {
+    prev.textContent = (currentUser.name||'?')[0].toUpperCase();
+    prev.style.background = currentUser.color || '#4f8aff';
+    prev.style.color = '#fff';
+    prev.style.fontWeight = '900';
+  }
+
+  // Fill preset grid
+  const grid = document.getElementById('change-photo-presets');
+  grid.innerHTML = '';
+  PRESET_PHOTOS.forEach((p, i) => {
+    const dataUrl = makeSvgDataUrl ? makeSvgDataUrl(p.emoji, p.bg) : svgToDataUrl(p.drawing);
+    const btn = document.createElement('div');
+    btn.id = 'cpp-' + i;
+    btn.style.cssText = `width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:all .2s;background:${p.bg}`;
+    btn.innerHTML = `<img src="${p.svg ? svgToDataUrl(p.drawing) : p.url}" style="width:100%;height:100%;object-fit:cover;display:block">`;
+    btn.onclick = () => {
+      _pendingNewPhoto = p.svg ? svgToDataUrl(p.drawing) : p.url;
+      prev.innerHTML = `<img src="${_pendingNewPhoto}" style="width:100%;height:100%;object-fit:cover">`;
+      document.querySelectorAll('[id^=cpp-]').forEach(el => el.style.borderColor='transparent');
+      btn.style.borderColor = 'var(--blue)';
+    };
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('change-photo-modal').classList.add('open');
+}
+
+function previewChangePhoto(input) {
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _pendingNewPhoto = e.target.result;
+    const prev = document.getElementById('change-photo-preview');
+    prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+    // clear preset selection
+    document.querySelectorAll('[id^=cpp-]').forEach(el => el.style.borderColor='transparent');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function saveChangedPhoto() {
+  if(!_pendingNewPhoto && _pendingNewPhoto !== null) { closeModal('change-photo-modal'); return; }
+  currentUser.photo = _pendingNewPhoto;
+  lsSet('zoomCurrentUser', currentUser);
+
+  // Update in Google accounts list too
+  const accs = getGoogleAccounts();
+  const idx = accs.findIndex(a => a.email === currentUser.email);
+  if(idx >= 0) { accs[idx].photo = _pendingNewPhoto; saveGoogleAccounts(accs); }
+
+  applyUserToUI();
+  closeModal('change-photo-modal');
+  showToast('✅ תמונת הפרופיל עודכנה!');
+}
+
+function openChangeCredentials() {
+  closeProfilePopup();
+  document.getElementById('current-pass-field').value = '';
+  document.getElementById('new-email-field').value = '';
+  document.getElementById('new-pass-field').value = '';
+  document.getElementById('change-cred-error').style.display = 'none';
+  document.getElementById('change-cred-error2') && (document.getElementById('change-cred-error2').style.display='none');
+  document.getElementById('cred-step1').style.display = 'block';
+  document.getElementById('cred-step2').style.display = 'none';
+  document.getElementById('change-cred-modal').classList.add('open');
+}
+
+function verifyCurrentPass() {
+  const currentPass = document.getElementById('current-pass-field').value;
+  const errEl = document.getElementById('change-cred-error');
+  errEl.style.display = 'none';
+  if(!currentUser) return;
+  if(!currentPass) { errEl.textContent='❌ הכנס סיסמה'; errEl.style.display='block'; return; }
+  const accounts = getGoogleAccounts();
+  const acc = accounts.find(a => a.email.toLowerCase() === currentUser.email.toLowerCase());
+  if(!acc || acc.password !== currentPass) {
+    errEl.textContent = '❌ סיסמה שגויה';
+    errEl.style.display = 'block';
+    return;
+  }
+  // Password correct — show step 2
+  document.getElementById('cred-step1').style.display = 'none';
+  document.getElementById('cred-step2').style.display = 'block';
+}
+
+function saveCredentials() {
+  const newEmail = document.getElementById('new-email-field').value.trim();
+  const newPass = document.getElementById('new-pass-field').value;
+  const errEl = document.getElementById('change-cred-error2');
+  if(errEl) errEl.style.display = 'none';
+  if(!currentUser) return;
+  const accounts = getGoogleAccounts();
+  const idx = accounts.findIndex(a => a.email.toLowerCase() === currentUser.email.toLowerCase());
+  if(idx === -1) return;
+  if(newEmail) {
+    if(!isValidEmail(newEmail)) { if(errEl){errEl.textContent='❌ אימייל לא תקין';errEl.style.display='block';} return; }
+    const dup = accounts.find((a,i) => i!==idx && a.email.toLowerCase()===newEmail.toLowerCase());
+    if(dup) { if(errEl){errEl.textContent='❌ אימייל זה כבר בשימוש';errEl.style.display='block';} return; }
+    accounts[idx].email = newEmail;
+    currentUser.email = newEmail;
+  }
+  if(newPass) {
+    if(newPass.length < 6) { if(errEl){errEl.textContent='❌ סיסמה חייבת להכיל לפחות 6 תווים';errEl.style.display='block';} return; }
+    accounts[idx].password = newPass;
+  }
+  saveGoogleAccounts(accounts);
+  lsSet('zoomCurrentUser', currentUser);
+  closeModal('change-cred-modal');
+  showToast('✅ הפרטים עודכנו!');
+}
+
+function openCredits() {
+  document.getElementById('credits-modal').classList.add('open');
+}
+
+// Switch user — goes to login but keeps account saved
+function switchUser() {
+  try { closeProfilePopup(); } catch(e){}
+  lsSet('zoomCurrentUser', null);
+  currentUser = null;
+  showPage('login-page');
+  showToast('🔄 התנתקת — בחר משתמש אחר');
+}
+
+// Raise hand queue
+let handQueue = [];
+let myHandRaised = false;
+function toggleRaiseHand() {
+  try {
+    const btn = document.getElementById('hand-btn');
+    const lbl = document.getElementById('hand-label');
+    if(!myHandRaised) {
+      myHandRaised = true;
+      handQueue.push({id:'self', name: currentUser ? currentUser.name : 'אני', time: Date.now()});
+      const pos = handQueue.length;
+      btn.style.background = 'rgba(255,204,0,.2)';
+      btn.style.borderColor = '#ffcc00';
+      if(lbl) lbl.textContent = '#' + pos;
+      const badge = document.getElementById('hand-badge-self');
+      const posEl = document.getElementById('hand-pos-self');
+      if(badge) badge.style.display = 'inline-flex';
+      if(posEl) posEl.textContent = pos;
+      showToast('✋ הצבעת! מקום #' + pos);
+      try { addChatSystem('✋ ' + (currentUser ? currentUser.name : 'אני') + ' הצביע/ה — מקום #' + pos); } catch(e){}
+    } else {
+      myHandRaised = false;
+      handQueue = handQueue.filter(h => h.id !== 'self');
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      if(lbl) lbl.textContent = 'הצבע';
+      const badge = document.getElementById('hand-badge-self');
+      if(badge) badge.style.display = 'none';
+      showToast('הצבעה בוטלה');
+    }
+    // Update participants sidebar
+    try { renderParticipantsSidebar(); } catch(e){}
+  } catch(e) { console.log('hand error:', e); }
+}
+
+// Emoji reactions
+function toggleEmojiPicker() {
+  const picker = document.getElementById('emoji-picker');
+  if(picker.style.display === 'none' || picker.style.display === '') {
+    picker.style.display = 'flex';
+  } else {
+    picker.style.display = 'none';
+  }
+}
+// Close emoji picker when clicking outside
+document.addEventListener('click', function(e) {
+  const picker = document.getElementById('emoji-picker');
+  const btn = document.getElementById('emoji-btn');
+  if(picker && btn && !picker.contains(e.target) && !btn.contains(e.target)) {
+    picker.style.display = 'none';
+  }
+});
+
+function sendEmoji(emoji) {
+  try { document.getElementById('emoji-picker').style.display = 'none'; } catch(e){}
+  if(emojiLocked) { showToast('😀 אימוגים כובו על ידי המנהל'); return; }
+  const name = currentUser ? currentUser.name : 'אני';
+  // Broadcast to server
+  try {
+    if(socket && socket.connected && currentRoomCode) {
+      socket.emit('emoji', { roomCode: currentRoomCode, emoji, user: { name } });
+    }
+  } catch(e){}
+  // Show floating emoji
+  showFloatingEmoji(emoji, name);
+  try { addChatSystem(name + ' ' + emoji); } catch(e){}
+}
+
+function showFloatingEmoji(emoji, name) {
+  const el = document.createElement('div');
+  const left = 10 + Math.random() * 70;
+  el.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;bottom:130px;left:'+left+'%;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 2s ease-out;opacity:1';
+  el.innerHTML = '<span style="font-size:48px">'+emoji+'</span><span style="font-size:11px;font-weight:800;background:rgba(0,0,0,.7);color:#fff;padding:2px 8px;border-radius:20px;white-space:nowrap">'+name+'</span>';
+  document.body.appendChild(el);
+  // Animate up and fade
+  setTimeout(function(){
+    el.style.bottom = '300px';
+    el.style.opacity = '0';
+  }, 50);
+  setTimeout(function(){ el.remove(); }, 2500);
+}
+
+// Screen share lock
+function openScreenPermModal() {
+  const list = document.getElementById('promote-list');
+  if(!list) return;
+  list.innerHTML = '<div style="font-size:13px;font-weight:800;color:var(--muted);margin-bottom:8px">בחר מי רשאי לשתף מסך:</div>';
+  const others = roomParticipants.filter(p => !p.self);
+  if(!others.length) {
+    list.innerHTML += '<div style="color:var(--muted);text-align:center;padding:12px">אין משתתפים נוספים</div>';
+  } else {
+    others.forEach(p => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)';
+      const allowed = p.canShare !== false;
+      row.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:' + (p.color||'#4f8aff') + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px">' + (p.name||'?')[0] + '</div><span style="font-size:14px">' + p.name + '</span></div>'
+        + '<button type="button" onclick="toggleScreenPerm(\''+p.id+'\',this)" style="padding:5px 12px;border-radius:8px;border:none;font-family:Heebo,sans-serif;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;background:'+(allowed?'rgba(0,229,160,.2)':'rgba(255,77,106,.2)')+';color:'+(allowed?'#00e5a0':'#ff4d6a')+'">'+(allowed?'✅ מותר':'❌ חסום')+'</button>';
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('promote-modal').classList.add('open');
+}
+
+function toggleScreenPerm(pid, btn) {
+  const p = roomParticipants.find(x => x.id === pid);
+  if(!p) return;
+  p.canShare = p.canShare === false ? true : false;
+  const allowed = p.canShare !== false;
+  btn.textContent = allowed ? '✅ מותר' : '❌ חסום';
+  btn.style.background = allowed ? 'rgba(0,229,160,.2)' : 'rgba(255,77,106,.2)';
+  btn.style.color = allowed ? 'var(--green)' : 'var(--red)';
+  showToast((allowed ? '✅ ' : '❌ ') + p.name + (allowed ? ' יכול לשתף' : ' לא יכול לשתף'));
+}
+
+function openScreenPermModal() {
+  const list = document.getElementById('promote-list');
+  if(!list) return;
+  list.innerHTML = '<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px">בחר מי יכול לשתף מסך:</div>';
+  roomParticipants.filter(p=>!p.self).forEach(p => {
+    const allowed = p.canScreen !== false;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s2);border:1px solid ' + (allowed?'var(--green)':'var(--border)') + ';border-radius:10px;cursor:pointer;font-family:Heebo,sans-serif;font-size:14px;color:var(--text);touch-action:manipulation;width:100%;margin-bottom:6px';
+    btn.innerHTML = '<div style="width:32px;height:32px;border-radius:50%;background:' + p.color + ';display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0">' + (p.name||'?')[0] + '</div><div style="flex:1;text-align:right">' + p.name + '</div><div style="font-size:12px;color:' + (allowed?'var(--green)':'var(--muted)') + '">' + (allowed?'✅ מורשה':'❌ חסום') + '</div>';
+    btn.onclick = function() {
+      p.canScreen = !allowed;
+      showToast((p.canScreen ? '✅ ' : '❌ ') + p.name + (p.canScreen ? ' יכול לשתף' : ' לא יכול לשתף'));
+      openScreenPermModal();
+    };
+    list.appendChild(btn);
+  });
+  if(roomParticipants.filter(p=>!p.self).length === 0) {
+    list.innerHTML += '<div style="color:var(--muted);text-align:center;padding:20px">אין משתתפים נוספים</div>';
+  }
+  document.getElementById('promote-modal').classList.add('open');
+}
+
+function toggleScreenShareLock() {
+  screenShareLocked = !screenShareLocked;
+  const btn = document.getElementById('screen-lock-btn');
+  if(btn) btn.textContent = screenShareLocked ? '🖥️ שיתוף מסך: מנהלים בלבד' : '🖥️ שיתוף מסך: כולם';
+  showToast(screenShareLocked ? '🖥️ שיתוף מסך — מנהלים בלבד' : '🖥️ שיתוף מסך — כולם יכולים');
+}
+
+var emojiLocked = false;
+var screenShareLocked = false;
+var screenShareAllowed = {};
+function toggleEmojiLock() {
+  emojiLocked = !emojiLocked;
+  const btn = document.getElementById('emoji-lock-btn');
+  if(btn) btn.textContent = emojiLocked ? '😀 אימוגים: כבוי' : '😀 אימוגים: פעיל';
+  showToast(emojiLocked ? '😀 אימוגים כובו' : '😀 אימוגים הופעלו');
+}
+
+function logOut() {
+  closeProfilePopup();
+  lsSet('zoomCurrentUser', null);
+  currentUser = null;
+  showPage('login-page');
+  showToast('👋 התנתקת בהצלחה');
+}
+
+function openAddUserModal() {
+  // Close current session and go to login to add new account
+  lsSet('zoomCurrentUser', null);
+  currentUser = null;
+  showPage('login-page');
+  showToast('➕ צור או התחבר למשתמש חדש');
+}
+
+function deleteCurrentUser() {
+  if(!currentUser) return;
+  if(!confirm('למחוק את המשתמש ' + currentUser.name + '?')) return;
+  // Remove from google accounts list
+  let accounts = getGoogleAccounts();
+  accounts = accounts.filter(a => a.email !== currentUser.email);
+  saveGoogleAccounts(accounts);
+  // Remove from regular accounts
+  let regAccounts = lsGet('zoomAccounts') || [];
+  regAccounts = regAccounts.filter(a => a.email !== currentUser.email);
+  lsSet('zoomAccounts', regAccounts);
+  // Logout
+  lsSet('zoomCurrentUser', null);
+  currentUser = null;
+  showPage('login-page');
+  showToast('🗑️ המשתמש נמחק');
+}
+</script>
+
+</body>
+</html>
