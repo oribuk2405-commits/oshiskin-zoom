@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/meetup-app (1).html" }
+  ]
+}
